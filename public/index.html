@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dduel.io</title>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+        // Canvas setup
+        let canvas = document.getElementById('canvas');
+        canvas.style.background = "black"
+        let ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Socket init
+        let socket = io('ws://localhost:3000');
+
+        let updates = [];
+        let gameStart = 0;
+        let firstServerTimestamp = 0;
+        const RENDER_DELAY = 100;
+
+        socket.on('connect', () => {
+            socket.emit('join');
+        });
+
+        socket.on('update', newUpdate => {
+            if (!firstServerTimestamp) {
+                firstServerTimestamp = newUpdate.t;
+                console.log(newUpdate.t)
+                gameStart = Date.now();
+            }
+
+            updates.push(newUpdate);
+            const base = getBaseUpdate();
+            if (base > 0) {
+                updates.splice(0, base);
+            }
+        });
+
+        function currentServerTime() {
+            return firstServerTimestamp + (Date.now() - gameStart) - RENDER_DELAY;
+        }
+
+
+        function getBaseUpdate() {
+            const serverTime = currentServerTime();
+            for (let i = updates.length - 1; i >= 0; i--) {
+                if (updates[i].t <= serverTime) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        // handle Update
+        function getCurrentState() {
+            if (!firstServerTimestamp) {
+                return {};
+            }
+
+            const base = getBaseUpdate();
+            const serverTime = currentServerTime();
+
+            // If base is the most recent update we have, use its state.
+            // Else, interpolate between its state and the state of (base + 1).
+            // if (base < 0 || base === gameUpdates.length - 1) {
+                return updates[updates.length - 1];
+            // }
+            // else {
+            //     const baseUpdate = updates[base];
+            //     const next = updates[base + 1];
+            //     const r = (serverTime - baseUpdate.t) / (next.t - baseUpdate.t);
+            //     return {
+            //         me: interpolateObject(baseUpdate.me, next.me, r),
+            //         otherPlayers: interpolateObjectArray(baseUpdate.otherPlayers, next.others, r),
+            //     };
+            // }
+        }
+
+        // Draw
+        function drawPlayers(ctx, me, otherPlayers) {
+            drawRect(ctx, me);
+            otherPlayers.forEach(p => drawRect(ctx, p));
+        }
+
+        function drawRect(ctx, { color, x, y, w, h }) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, w, h);
+        }
+
+        // Input Listener
+        function updateDirection(code) {
+            return (code == 68 || code == 39 || code == 83 || code == 40 || code == 65 || code == 37 || code == 87 || code == 38)
+        }
+
+        function handleInput(e, value) {
+            let direction = updateDirection(e.which);
+            if (direction)
+                socket.emit('input', { keyCode: e.which, value });
+        }
+
+        document.addEventListener('keydown', (e) => handleInput(e, true));
+        document.addEventListener('keyup', (e) => handleInput(e, false));
+
+        // Main Loop
+        function run() {
+            // get update
+            let state = getCurrentState();
+            let { me, otherPlayers } = state;
+            // clear screen
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // draw
+            drawPlayers(ctx, me, otherPlayers);
+        }
+
+        setInterval(run, 1000 / 60);
+
+    </script>
+</body>
+
+</html>

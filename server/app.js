@@ -1,37 +1,29 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const p2 = require('p2');
 
 const PORT = 3000;
+app.use('/', express.static('public'));
 
-let players = [];
+const Game = require('./models/game');
+let game = new Game();
 
 io.on('connection', socket => {
 
-    socket.on('join', (player) => {
-        players.push(player);
-        socket.broadcast.emit('playerJoined', player);
-        console.log('Player Connectado Total: ', players.length);
+    socket.on('join', () => {
+        game.addPlayer(socket);
+        console.log(socket.id + ' connected');
+    });
+
+    socket.on('input', (input) => {
+        game.handleInput(socket, input);
+        console.log(socket.id + ' pressed');
     });
     
-    socket.on('getPlayers', () => {
-        socket.emit('getPlayers', players.filter(p => p.id !== socket.id))
-        console.log('get players', players);
-    });
-
-    socket.on('move', (player) => {
-        // update coordinates
-        let p = players.find(p => p.id == player.id);
-        p.x = player.x;
-        p.y = player.y;
-        socket.broadcast.emit('playerMoved', player);
-    });
-
     socket.on('disconnect', () => {
+        game.removePlayer(socket);
         console.log(socket.id + ' disconnected');
-        socket.broadcast.emit('disconnected', socket.id);
-        players.splice(players.findIndex(p => p.id === socket.id), 1)
     });
     
 });
