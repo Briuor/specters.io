@@ -27,23 +27,29 @@
         let firstServerTimestamp = 0;
         const RENDER_DELAY = 100;
 
-        socket.on('connect', () => {
-            socket.emit('join');
-        });
+        const connectPromise = new Promise(resolve => {
+            socket.on('connect', () => {
+                socket.emit('join');
+                resolve();
+            });
+        })
 
-        socket.on('update', newUpdate => {
-            if (!firstServerTimestamp) {
-                firstServerTimestamp = newUpdate.t;
-                console.log(newUpdate.t)
-                gameStart = Date.now();
-            }
+        function connect() {
+            connectPromise.then(() => {
+                socket.on('update', newUpdate => {
+                    if (!firstServerTimestamp) {
+                        firstServerTimestamp = newUpdate.t;
+                        gameStart = Date.now();
+                    }
 
-            updates.push(newUpdate);
-            const base = getBaseUpdate();
-            if (base > 0) {
-                updates.splice(0, base);
-            }
-        });
+                    updates.push(newUpdate);
+                    const base = getBaseUpdate();
+                    if (base > 0) {
+                        updates.splice(0, base);
+                    }
+                });
+            })
+        }
 
         function currentServerTime() {
             return firstServerTimestamp + (Date.now() - gameStart) - RENDER_DELAY;
@@ -71,31 +77,32 @@
 
             // If base is the most recent update we have, use its state.
             // Else, interpolate between its state and the state of (base + 1).
-        //     return updates[updates.length - 1];
-        // }
-            if (base < 0 || base === updates.length - 1) {
+                console.log(updates.length)
                 return updates[updates.length - 1];
             }
-            else {
-                const baseUpdate = updates[base];
-                const next = updates[base + 1];
-                const r = (serverTime - baseUpdate.t) / (next.t - baseUpdate.t);
-                return {
-                    me: interpolateObject(baseUpdate.me, next.me, r),
-                    otherPlayers: interpolateObjectArray(baseUpdate.otherPlayers, next.otherPlayers, r),
-                };
-            }
-        }
+            // if (base < 0 || base === updates.length - 1) {
+                // return updates[updates.length - 1];
+            // }
+            // else {
+            //     const baseUpdate = updates[base];
+            //     const next = updates[base + 1];
+            //     const r = (serverTime - baseUpdate.t) / (next.t - baseUpdate.t);
+            //     return {
+            //         me: interpolateObject(baseUpdate.me, next.me, r),
+            //         otherPlayers: interpolateObjectArray(baseUpdate.otherPlayers, next.otherPlayers, r),
+            //     };
+            // }
+        // }
 
-        function interpolateObjectArray(previousOthers, nextOthers, r) {
-            return previousOthers.map(p => interpolateObject(p, nextOthers.find(n => n.id === p.id), r))
-        }
-    
-        function interpolateObject(previous, next, r) {
-            previous.x = (1 - r) * previous.x + r * next.x;
-            previous.y = (1 - r) * previous.y + r * next.y;
-            return previous;
-        }
+        // function interpolateObjectArray(previousOthers, nextOthers, r) {
+        //     return previousOthers.map(p => interpolateObject(p, nextOthers.find(n => n.id === p.id), r))
+        // }
+
+        // function interpolateObject(previous, next, r) {
+        //     previous.x = (1 - r) * previous.x + r * next.x;
+        //     previous.y = (1 - r) * previous.y + r * next.y;
+        //     return previous;
+        // }
 
         // Draw
         function drawPlayers(ctx, me, otherPlayers) {
@@ -109,13 +116,12 @@
         }
 
         // Input Listener
-        function updateDirection(code) {
+        function isDirection(code) {
             return (code == 68 || code == 39 || code == 83 || code == 40 || code == 65 || code == 37 || code == 87 || code == 38)
         }
 
         function handleInput(e, value) {
-            let direction = updateDirection(e.which);
-            if (direction)
+            if (isDirection(e.which))
                 socket.emit('input', { keyCode: e.which, value });
         }
 
@@ -127,6 +133,8 @@
             // get update
             let state = getCurrentState();
             let { me, otherPlayers } = state;
+            if(!me) return ;
+            console.log(me.x, me.y)
             // clear screen
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -134,8 +142,9 @@
             drawPlayers(ctx, me, otherPlayers);
         }
 
-        setInterval(run, 1000 / 60);
-
+        Promise.all([connect()]).then(() => {
+            setInterval(run, 1000 / 60);
+        });
     </script>
 </body>
 

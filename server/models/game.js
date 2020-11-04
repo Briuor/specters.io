@@ -33,6 +33,7 @@ class Game {
         // send update event to each client
         Object.keys(this.sockets).forEach(socketId => {
             let me = this.players[socketId];
+            console.log(`(${me.x}, ${me.y})`);
             let otherPlayers = Object.values(this.players).filter(p => p !== me);
             this.sockets[socketId].emit('update', { t: Date.now(), me, otherPlayers });
         });
