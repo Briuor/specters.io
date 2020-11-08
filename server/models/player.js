@@ -1,5 +1,8 @@
+const Bullet = require("./bullet");
+
 class Player {
     constructor(x, y) {
+        this.hp = 100;
         this.x = x;
         this.y = y;
         this.w = 32;
@@ -7,6 +10,7 @@ class Player {
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 5;
         this.color = 'red';
+        this.angle = 0;
     }
 
     move() {
@@ -14,6 +18,18 @@ class Player {
         if (this.direction.left) this.x -= this.speed;
         if (this.direction.up) this.y -= this.speed;
         if (this.direction.down) this.y += this.speed;
+    }
+
+    shoot(screen, ownerId) {
+        console.log(screen.x, screen.y)
+        return new Bullet(screen.x, screen.y, 10, 10, this.angle, ownerId);
+    }
+
+    updateAngle(input) {
+        let centerX = input.screen.x + this.w / 2;
+        let centerY = input.screen.y + this.h / 2;
+
+        this.angle = Math.atan2(input.y - centerY, input.x - centerX) + Math.PI / 2;
     }
 
     updateDirection(code, value) {
