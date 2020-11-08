@@ -151,7 +151,7 @@
 
         function drawPlayers(ctx, otherPlayers, bullets) {
             otherPlayers.forEach(p => draw(ctx, p));
-            bullets.forEach(b => drawBullet(ctx, b));
+            bullets.forEach(b => draw(ctx, b));
         }
 
         function draw(ctx, p) {

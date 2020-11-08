@@ -21,8 +21,8 @@ class Player {
     }
 
     shoot(screen, ownerId) {
-        console.log(screen.x, screen.y)
-        return new Bullet(screen.x, screen.y, 10, 10, this.angle, ownerId);
+        console.log(this.x, this.y)
+        return new Bullet(this.x, this.y, 10, 10, this.angle, ownerId);
     }
 
     updateAngle(input) {
