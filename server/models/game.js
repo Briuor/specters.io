@@ -57,7 +57,7 @@ class Game {
             Object.keys(this.players).forEach(player2Id => {
                 if (player1Id !== player2Id) {
                     const player2 = this.players[player2Id];
-                    if (CollisionHandler.rectReactCollision(player1, player2)) {
+                    if (CollisionHandler.circleCircleCollision(player1, player2)) {
                         console.log('collided');
                     }
                 }
@@ -69,7 +69,7 @@ class Game {
             Object.keys(this.players).forEach(playerId => {
                 if (bullet.ownerId != playerId) {
                     const player = this.players[playerId];
-                    if (CollisionHandler.rectCircleCollision(bullet, player)) {
+                    if (CollisionHandler.circleCircleCollision(bullet, player)) {
                         console.log('collide bullet');
                         player.takeDamage(10);
                         this.players[bullet.ownerId].inscreaseScore(1);

@@ -24,6 +24,13 @@ class CollisionHandler {
         return (cornerDistance_sq <= (circle.r ^ 2));
     }
 
+    static circleCircleCollision(c1, c2) {
+        let x = c1.x - c2.x;
+        let y = c1.y - c2.y;
+
+        return c1.r + c2.r > Math.sqrt((x * x) + (y * y));
+    }
+
     static doPolygonsIntersect(a, b) {
         var polygons = [a, b];
         var minA, maxA, projected, i, i1, j, minB, maxB;

@@ -8,7 +8,7 @@ class Render {
         ctx.translate(-(me.screenX), -(me.screenY));
         //draw RECT
         ctx.fillStyle = me.color;
-        ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
+        ctx.fillRect(me.screenX - me.r, me.screenY - me.r, me.w, me.h);
         //draw LINE
         ctx.beginPath();
         ctx.moveTo(me.screenX, me.screenY);
@@ -22,20 +22,22 @@ class Render {
 
     drawPlayers(ctx, otherPlayers, bullets, camera) {
         otherPlayers.forEach(p => this.draw(ctx, p, camera));
-        bullets.forEach(b => this.drawBullet(ctx, b, camera));
+        bullets.forEach(b => this.draw(ctx, b, camera));
     }
 
     draw(ctx, p, camera) {
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x - camera.x - p.w / 2, p.y - camera.y - p.w / 2, p.w, p.h);
-    }
-
-    drawBullet(ctx, p, camera) {
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x - camera.x - p.r / 2, p.y - camera.y - p.r / 2, p.r, 0, 2 * Math.PI);
         ctx.fill();
     }
+
+    // drawBullet(ctx, p, camera) {
+    //     ctx.fillStyle = p.color;
+    //     ctx.beginPath();
+    //     ctx.arc(p.x - camera.x - p.r / 2, p.y - camera.y - p.r / 2, p.r, 0, 2 * Math.PI);
+    //     ctx.fill();
+    // }
 
     drawRect(ctx, { color, x, y, w, h, angle }) {
         ctx.save();

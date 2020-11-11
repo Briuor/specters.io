@@ -1,14 +1,14 @@
-// const Matter = require('matterjs');
+// const Matter = require('matter-js');
 const Bullet = require("./bullet");
 
 class Player {
     constructor(x, y) {
         this.hp = 100;
         // this.body = Matter.Bodies.circle(x, y, 20, [], 50);
+        // Matter.Body.setAngle(this.body, 0);
         this.x = x;
         this.y = y;
-        this.w = 32;
-        this.h = 32;
+        this.r = 16;
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 5;
         this.color = 'red';
@@ -42,8 +42,8 @@ class Player {
     }
 
     updateAngle(input) {
-        let centerX = input.screen.x + this.w / 2;
-        let centerY = input.screen.y + this.h / 2;
+        let centerX = input.screen.x + this.r;
+        let centerY = input.screen.y + this.r;
 
         this.angle = Math.atan2(input.y - centerY, input.x - centerX) + Math.PI / 2;
     }
