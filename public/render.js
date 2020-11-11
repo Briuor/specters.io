@@ -1,20 +1,22 @@
 class Render {
 
     drawPlayer(ctx, me) {
-        ctx.save();
-        //ROTATE
-        ctx.translate(me.screenX, me.screenY);
-        ctx.rotate(me.angle);
-        ctx.translate(-(me.screenX), -(me.screenY));
-        //draw RECT
+        // ctx.save();
+        // //ROTATE
+        // ctx.translate(me.screenX, me.screenY);
+        // ctx.rotate(me.angle);
+        // ctx.translate(-(me.screenX), -(me.screenY));
+        // //draw RECT
         ctx.fillStyle = me.color;
-        ctx.fillRect(me.screenX - me.r, me.screenY - me.r, me.w, me.h);
-        //draw LINE
         ctx.beginPath();
-        ctx.moveTo(me.screenX, me.screenY);
-        ctx.lineTo(me.screenX, (me.screenY) - 10);
-        ctx.stroke();
-        ctx.restore();
+        ctx.arc(me.screenX, me.screenY, me.r, 0, 2 * Math.PI);
+        ctx.fill();
+        //draw LINE
+        // ctx.beginPath();
+        // ctx.moveTo(me.screenX, me.screenY);
+        // ctx.lineTo(me.screenX, (me.screenY) - 10);
+        // ctx.stroke();
+        // ctx.restore();
         // ctx.fillStyle = me.color;
         // ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
 
@@ -28,7 +30,7 @@ class Render {
     draw(ctx, p, camera) {
         ctx.fillStyle = p.color;
         ctx.beginPath();
-        ctx.arc(p.x - camera.x - p.r / 2, p.y - camera.y - p.r / 2, p.r, 0, 2 * Math.PI);
+        ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
         ctx.fill();
     }
 

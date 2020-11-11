@@ -8,7 +8,7 @@ class Player {
         // Matter.Body.setAngle(this.body, 0);
         this.x = x;
         this.y = y;
-        this.r = 16;
+        this.r = 64;
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 5;
         this.color = 'red';
@@ -42,8 +42,8 @@ class Player {
     }
 
     updateAngle(input) {
-        let centerX = input.screen.x + this.r;
-        let centerY = input.screen.y + this.r;
+        let centerX = input.screen.x + this.r/2;
+        let centerY = input.screen.y + this.r/2;
 
         this.angle = Math.atan2(input.y - centerY, input.x - centerX) + Math.PI / 2;
     }
