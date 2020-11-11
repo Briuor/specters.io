@@ -1,8 +1,10 @@
+// const Matter = require('matterjs');
 const Bullet = require("./bullet");
 
 class Player {
     constructor(x, y) {
         this.hp = 100;
+        // this.body = Matter.Bodies.circle(x, y, 20, [], 50);
         this.x = x;
         this.y = y;
         this.w = 32;

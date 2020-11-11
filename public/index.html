@@ -9,6 +9,10 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
     <script src="./camera.js"></script>
     <script src="./map.js"></script>
+    <script src="./state.js"></script>
+    <script src="./network.js"></script>
+    <script src="./render.js"></script>
+    <script src="./input.js"></script>
 </head>
 
 <body>
@@ -20,171 +24,18 @@
         let ctx = canvas.getContext('2d');
         canvas.width = 640;
         canvas.height = 320;
-        // window.addEventListener("resize", OnResizeCalled, false);
-        // function OnResizeCalled() {
-        //     canvas.style.width = window.innerWidth + 'px';
-        //     canvas.style.height = window.innerHeight + 'px';
-        // }
 
-        const map = new Map();
+        const map = new  Map();
         const camera = new Camera(canvas.width, canvas.height);
-
-
-        // Socket init
-        let socket = io('ws://localhost:3000');
-
-        let updates = [];
-        let gameStart = 0;
-        let firstServerTimestamp = 0;
-        const RENDER_DELAY = 100;
-
-        const connectPromise = new Promise(resolve => {
-            socket.on('connect', () => {
-                socket.emit('join');
-                resolve();
-            });
-        })
-
-        function connect() {
-            connectPromise.then(() => {
-                socket.on('update', newUpdate => {
-                    if (!firstServerTimestamp) {
-                        firstServerTimestamp = newUpdate.t;
-                        gameStart = Date.now();
-                    }
-
-                    updates.push(newUpdate);
-                    const base = getBaseUpdate();
-                    if (base > 0) {
-                        updates.splice(0, base);
-                    }
-                });
-            })
-        }
-
-        function currentServerTime() {
-            return firstServerTimestamp + (Date.now() - gameStart) - RENDER_DELAY;
-        }
-
-
-        function getBaseUpdate() {
-            const serverTime = currentServerTime();
-            for (let i = updates.length - 1; i >= 0; i--) {
-                if (updates[i].t <= serverTime) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        // handle Update
-        function getCurrentState() {
-            if (!firstServerTimestamp) {
-                return {};
-            }
-
-            const base = getBaseUpdate();
-            const serverTime = currentServerTime();
-
-            console.log(updates.length)
-            return updates[updates.length - 1];
-        }
-        
-
-        // Draw
-        function drawMap(ctx, map) {
-            for (let c = 0; c < map.cols; c++) {
-                for (let r = 0; r < map.rows; r++) {
-                    if (map.getTile(c, r) == 1)
-                        ctx.fillStyle = 'grey';
-                    else
-                        ctx.fillStyle = 'blue';
-                        console.log(map.cols)
-                    ctx.fillRect(r * map.tsize, c * map.tsize, map.tsize, map.tsize);
-                }
-            }
-        }
-
-        function drawPlayer(me) {
-            ctx.save();
-                //ROTATE
-                ctx.translate(me.screenX, me.screenY );
-                ctx.rotate(me.angle);
-                ctx.translate(-(me.screenX), -(me.screenY ));
-                //draw RECT
-                ctx.fillStyle = me.color;
-                ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
-                //draw LINE
-                ctx.beginPath();
-                ctx.moveTo(me.screenX , me.screenY );
-                ctx.lineTo(me.screenX , (me.screenY ) - 10);
-                ctx.stroke();
-            ctx.restore();
-            // ctx.fillStyle = me.color;
-            // ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
-
-        }
-
-        function drawPlayers(ctx, otherPlayers, bullets) {
-            otherPlayers.forEach(p => draw(ctx, p));
-            bullets.forEach(b => drawBullet(ctx, b));
-        }
-
-        function draw(ctx, p) {
-            ctx.fillStyle = p.color;
-            ctx.fillRect(p.x - camera.x -p.w/2, p.y - camera.y -p.w/2, p.w, p.h);
-        }
-
-        function drawBullet(ctx, p) {
-            ctx.fillStyle = p.color;
-            ctx.beginPath();
-            ctx.arc(p.x - camera.x - p.r / 2, p.y - camera.y - p.r / 2, p.r, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-
-        function drawRect(ctx, { color, x, y, w, h, angle }) {
-            ctx.save();
-                //ROTATE
-                ctx.translate(x + w / 2, y + h / 2);
-                ctx.rotate(angle);
-                ctx.translate(-(x + w / 2), -(y + h / 2));
-                //draw RECT
-                ctx.fillStyle = color;
-                ctx.fillRect(x, y, w, h);
-                //draw LINE
-                ctx.beginPath();
-                ctx.moveTo(x + w / 2, y + h / 2);
-                ctx.lineTo(x + w / 2, (y + h / 2) - 10);
-                ctx.stroke();
-            ctx.restore();
-        }
-
-        // Input Listener
-        function isDirection(code) {
-            return (code == 68 || code == 39 || code == 83 || code == 40 || code == 65 || code == 37 || code == 87 || code == 38)
-        }
-
-        function handleKeyBoardInput(e, value) {
-            if (isDirection(e.which))
-                socket.emit('input', { keyCode: e.which, value, type: 'keyboard' });
-        }
-
-        function handleMouseInput(e, type) {
-            if(camera.following) {
-                console.log(camera.following.screenX, camera.following.screenY);
-                socket.emit('input', { x: e.clientX, y: e.clientY, type, screen: {x: camera.following.screenX, y: camera.following.screenY } });
-            }
-        }
-
-        document.addEventListener('keydown', (e) => handleKeyBoardInput(e, true));
-        document.addEventListener('keyup', (e) => handleKeyBoardInput(e, false));
-        document.addEventListener('mousemove', (e) => handleMouseInput(e, 'mousemove'));
-        document.addEventListener('click', (e) => handleMouseInput(e, 'mouseclick'));
+        const state = new State();
+        const network = new Network();
+        const render = new Render();
+        const input = new Input(network, camera);
 
         // Main Loop
         function run() {
             // get update
-            const { me, otherPlayers, bullets } = getCurrentState();
+            const { me, otherPlayers, bullets } = state.getCurrentState();
             if (!me) return;
             camera.follow(me);
             camera.update();
@@ -194,11 +45,11 @@
 
             // draw
             camera.draw(ctx, map);
-            drawPlayer(me);
-            drawPlayers(ctx, otherPlayers, bullets);
+            render.drawPlayer(ctx, me);
+            render.drawPlayers(ctx, otherPlayers, bullets, camera);
         }
 
-        Promise.all([connect()]).then(() => {
+        Promise.all([network.connect(state)]).then(() => {
             setInterval(run, 1000 / 60);
         });
     </script>
