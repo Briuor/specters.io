@@ -5,7 +5,24 @@ class CollisionHandler {
             rect1.x + rect1.w > rect2.x &&
             rect1.y < rect2.y + rect2.h &&
             rect1.y + rect1.h > rect2.y
-}
+    }
+
+    static rectCircleCollision(circle, rect) {
+        let circleDistance = {};
+        circleDistance.x = Math.abs(circle.x - rect.x);
+        circleDistance.y = Math.abs(circle.y - rect.y);
+
+        if (circleDistance.x > (rect.w / 2 + circle.r)) { return false; }
+        if (circleDistance.y > (rect.h / 2 + circle.r)) { return false; }
+
+        if (circleDistance.x <= (rect.w / 2)) { return true; }
+        if (circleDistance.y <= (rect.h / 2)) { return true; }
+
+        let cornerDistance_sq = (circleDistance.x - rect.w / 2) ^ 2 +
+            (circleDistance.y - rect.h / 2) ^ 2;
+
+        return (cornerDistance_sq <= (circle.r ^ 2));
+    }
 
     static doPolygonsIntersect(a, b) {
         var polygons = [a, b];

@@ -86,34 +86,10 @@
             const base = getBaseUpdate();
             const serverTime = currentServerTime();
 
-            // If base is the most recent update we have, use its state.
-            // Else, interpolate between its state and the state of (base + 1).
             console.log(updates.length)
             return updates[updates.length - 1];
         }
-        // if (base < 0 || base === updates.length - 1) {
-        // return updates[updates.length - 1];
-        // }
-        // else {
-        //     const baseUpdate = updates[base];
-        //     const next = updates[base + 1];
-        //     const r = (serverTime - baseUpdate.t) / (next.t - baseUpdate.t);
-        //     return {
-        //         me: interpolateObject(baseUpdate.me, next.me, r),
-        //         otherPlayers: interpolateObjectArray(baseUpdate.otherPlayers, next.otherPlayers, r),
-        //     };
-        // }
-        // }
-
-        // function interpolateObjectArray(previousOthers, nextOthers, r) {
-        //     return previousOthers.map(p => interpolateObject(p, nextOthers.find(n => n.id === p.id), r))
-        // }
-
-        // function interpolateObject(previous, next, r) {
-        //     previous.x = (1 - r) * previous.x + r * next.x;
-        //     previous.y = (1 - r) * previous.y + r * next.y;
-        //     return previous;
-        // }
+        
 
         // Draw
         function drawMap(ctx, map) {
@@ -136,8 +112,8 @@
                 ctx.rotate(me.angle);
                 ctx.translate(-(me.screenX), -(me.screenY ));
                 //draw RECT
-            ctx.fillStyle = me.color;
-            ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
+                ctx.fillStyle = me.color;
+                ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
                 //draw LINE
                 ctx.beginPath();
                 ctx.moveTo(me.screenX , me.screenY );
@@ -151,7 +127,7 @@
 
         function drawPlayers(ctx, otherPlayers, bullets) {
             otherPlayers.forEach(p => draw(ctx, p));
-            bullets.forEach(b => draw(ctx, b));
+            bullets.forEach(b => drawBullet(ctx, b));
         }
 
         function draw(ctx, p) {
@@ -161,7 +137,9 @@
 
         function drawBullet(ctx, p) {
             ctx.fillStyle = p.color;
-            ctx.fillRect(p.x, p.y, p.w, p.h);
+            ctx.beginPath();
+            ctx.arc(p.x - camera.x - p.r / 2, p.y - camera.y - p.r / 2, p.r, 0, 2 * Math.PI);
+            ctx.fill();
         }
 
         function drawRect(ctx, { color, x, y, w, h, angle }) {
@@ -209,7 +187,8 @@
             const { me, otherPlayers, bullets } = getCurrentState();
             if (!me) return;
             camera.follow(me);
-            camera.update(me);
+            camera.update();
+            
             // clear screen
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 

@@ -1,9 +1,8 @@
 class Bullet {
-    constructor(x, y, w, h, angle, ownerId) {
+    constructor(x, y, r, angle, ownerId) {
         this.x = x;
         this.y = y;
-        this.w = w;
-        this.h = h;
+        this.r = r;
         this.speed = 5;
         this.angle = angle;
         this.ownerId = ownerId;

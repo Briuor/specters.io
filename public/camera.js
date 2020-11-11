@@ -15,7 +15,7 @@ class Camera {
         me.screenY = 0;
     }
 
-    update(me) {
+    update() {
         // Center player on screen
         this.following.screenX = this.w / 2;
         this.following.screenY = this.h / 2;

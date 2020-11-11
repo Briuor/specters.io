@@ -26,7 +26,7 @@ class Game {
             this.players[socket.id].updateAngle(input);
         }
         else if (input.type == 'mouseclick') {
-            const bullet = this.players[socket.id].shoot(input.screen, socket.id);
+            const bullet = this.players[socket.id].shoot(socket.id);
             this.bullets.push(bullet);
         }
         else if (input.type == 'keyboard') {
@@ -37,16 +37,21 @@ class Game {
     }
 
     update() {
-        // move
+        // move player
         Object.keys(this.players).forEach(playerId => {
             this.players[playerId].move();
         });
         
-        this.bullets.forEach(bullet => {
+        // move bullet
+        this.bullets.forEach((bullet, index) => {
             bullet.move();
+            if (bullet.x < 0 || bullet.x > 1240 || bullet.y < 0 || bullet.y > 1240) {
+                this.bullets.splice(index, 1);
+                console.log('bullet removed wall collision')
+            }
         })
 
-        // collision
+        // collision player player
         Object.keys(this.players).forEach(player1Id => {
             const player1 = this.players[player1Id];
             Object.keys(this.players).forEach(player2Id => {
@@ -54,6 +59,21 @@ class Game {
                     const player2 = this.players[player2Id];
                     if (CollisionHandler.rectReactCollision(player1, player2)) {
                         console.log('collided');
+                    }
+                }
+            })
+        })
+
+        // collision bullet player
+        this.bullets.forEach((bullet, bulletIndex) => {
+            Object.keys(this.players).forEach(playerId => {
+                if (bullet.ownerId != playerId) {
+                    const player = this.players[playerId];
+                    if (CollisionHandler.rectCircleCollision(bullet, player)) {
+                        console.log('collide bullet');
+                        player.takeDamage(10);
+                        this.players[bullet.ownerId].inscreaseScore(1);
+                        this.bullets.splice(bulletIndex, 1);
                     }
                 }
             })
