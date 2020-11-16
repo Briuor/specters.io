@@ -9,6 +9,7 @@ class Render {
         // //draw RECT
         ctx.fillStyle = me.color;
         ctx.beginPath();
+        console.log(me)
         ctx.arc(me.screenX, me.screenY, me.r, 0, 2 * Math.PI);
         ctx.fill();
         //draw LINE
@@ -33,13 +34,6 @@ class Render {
         ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
         ctx.fill();
     }
-
-    // drawBullet(ctx, p, camera) {
-    //     ctx.fillStyle = p.color;
-    //     ctx.beginPath();
-    //     ctx.arc(p.x - camera.x - p.r / 2, p.y - camera.y - p.r / 2, p.r, 0, 2 * Math.PI);
-    //     ctx.fill();
-    // }
 
     drawRect(ctx, { color, x, y, w, h, angle }) {
         ctx.save();
