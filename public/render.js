@@ -1,6 +1,6 @@
 class Render {
 
-    drawPlayer(ctx, me) {
+    drawPlayer(ctx, me, camera) {
         // ctx.save();
         // //ROTATE
         // ctx.translate(me.screenX, me.screenY);
@@ -9,9 +9,16 @@ class Render {
         // //draw RECT
         ctx.fillStyle = me.color;
         ctx.beginPath();
-        console.log(me)
+        // console.log(me)
         ctx.arc(me.screenX, me.screenY, me.r, 0, 2 * Math.PI);
         ctx.fill();
+        if (me.rope) {
+            ctx.strokeStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(me.rope.p1.x - camera.x, me.rope.p1.y - camera.y);
+            ctx.lineTo(me.rope.p2.x - camera.x, me.rope.p2.y - camera.y);
+            ctx.stroke();
+        }
         //draw LINE
         // ctx.beginPath();
         // ctx.moveTo(me.screenX, me.screenY);
@@ -21,34 +28,61 @@ class Render {
         // ctx.fillStyle = me.color;
         // ctx.fillRect(me.screenX - me.w / 2, me.screenY - me.h / 2, me.w, me.h);
 
+        // m.r * 2 = 100
+        this.drawLife(ctx, me)
     }
 
-    drawPlayers(ctx, otherPlayers, bullets, camera) {
-        otherPlayers.forEach(p => this.draw(ctx, p, camera));
-        bullets.forEach(b => this.draw(ctx, b, camera));
+    drawLife(ctx, player) {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(
+            player.screenX - player.r,
+            player.screenY + player.r + 8,
+            (player.r * 2 * 100) / 100,
+            4,
+        );
+        ctx.fillStyle = 'white';
+        ctx.fillRect(
+            player.screenX - player.r,
+            player.screenY + player.r + 8,
+            (player.r * 2 * player.hp) / 100,
+            4,
+        );
     }
 
-    draw(ctx, p, camera) {
+    drawLifeOtherPlayer(ctx, player, camera) {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(
+            player.x - player.r - camera.x,
+            player.y + player.r - camera.y + 8,
+            (player.r * 2 * 100) / 100,
+            4,
+        );
+        ctx.fillStyle = 'white';
+        ctx.fillRect(
+            player.x - player.r - camera.x,
+            player.y + player.r - camera.y + 8,
+            (player.r * 2 * player.hp) / 100,
+            4,
+        );
+    }
+
+    draw(ctx, otherPlayers, bullets, camera) {
+        otherPlayers.forEach(p => this.drawOtherPlayer(ctx, p, camera));
+        bullets.forEach(b => this.drawBullet(ctx, b, camera));
+    }
+
+    drawOtherPlayer(ctx, p, camera) {
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
         ctx.fill();
+        this.drawLifeOtherPlayer(ctx, p, camera);
     }
 
-    drawRect(ctx, { color, x, y, w, h, angle }) {
-        ctx.save();
-        //ROTATE
-        ctx.translate(x + w / 2, y + h / 2);
-        ctx.rotate(angle);
-        ctx.translate(-(x + w / 2), -(y + h / 2));
-        //draw RECT
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, w, h);
-        //draw LINE
+    drawBullet(ctx, p, camera) {
+        ctx.fillStyle = p.color;
         ctx.beginPath();
-        ctx.moveTo(x + w / 2, y + h / 2);
-        ctx.lineTo(x + w / 2, (y + h / 2) - 10);
-        ctx.stroke();
-        ctx.restore();
+        ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
+        ctx.fill();
     }
 }

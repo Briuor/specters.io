@@ -22,8 +22,13 @@
         let canvas = document.getElementById('canvas');
         canvas.style.background = "black"
         let ctx = canvas.getContext('2d');
-        canvas.width = 640;
-        canvas.height = 320;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+            return false;
+        });
 
         const map = new  Map();
         const camera = new Camera(canvas.width, canvas.height);
@@ -32,10 +37,13 @@
         const render = new Render();
         const input = new Input(network, camera);
 
+        const loopRef = null;
+
         // Main Loop
         function run() {
             // get update
             const { me, otherPlayers, bullets } = state.getCurrentState();
+            console.log(me);
             if (!me) return;
             camera.follow(me);
             camera.update();
@@ -45,12 +53,12 @@
 
             // draw
             camera.draw(ctx, map);
-            render.drawPlayer(ctx, me);
-            render.drawPlayers(ctx, otherPlayers, bullets, camera);
+            render.drawPlayer(ctx, me, camera);
+            render.draw(ctx, otherPlayers, bullets, camera);
         }
 
-        Promise.all([network.connect(state)]).then(() => {
-            setInterval(run, 1000 / 60);
+        Promise.all([network.connect(state, loopRef)]).then(() => {
+            loopRef = setInterval(run, 1000 / 60);
         });
     </script>
 </body>

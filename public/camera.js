@@ -58,7 +58,7 @@ class Camera {
                 if (tile == 1)
                     ctx.fillStyle = 'grey';
                 else
-                    ctx.fillStyle = 'blue';
+                    ctx.fillStyle = 'black';
 
                 ctx.fillRect(
                     Math.round(x),  // target x
