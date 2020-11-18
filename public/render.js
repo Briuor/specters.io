@@ -76,6 +76,13 @@ class Render {
         ctx.beginPath();
         ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
         ctx.fill();
+        if (p.rope) {
+            ctx.strokeStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(p.rope.p1.x - camera.x, p.rope.p1.y - camera.y);
+            ctx.lineTo(p.rope.p2.x - camera.x, p.rope.p2.y - camera.y);
+            ctx.stroke();
+        }
         this.drawLifeOtherPlayer(ctx, p, camera);
     }
 
