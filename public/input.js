@@ -5,6 +5,7 @@ class Input {
         document.addEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove',network, camera));
         document.addEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera));
     }
+    
     isDirection(code) {
         return (code == 68 || code == 39 || code == 83 || code == 40 || code == 65 || code == 37 || code == 87 || code == 38)
     }

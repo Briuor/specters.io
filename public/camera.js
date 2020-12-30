@@ -56,9 +56,9 @@ class Camera {
                 var x = (c - startCol) * map.tsize + offsetX;
                 var y = (r - startRow) * map.tsize + offsetY;
                 if (tile == 1)
-                    ctx.fillStyle = 'grey';
+                    ctx.fillStyle = '#ff0000';
                 else
-                    ctx.fillStyle = 'blue';
+                    ctx.fillStyle = '#252525';
 
                 ctx.fillRect(
                     Math.round(x),  // target x

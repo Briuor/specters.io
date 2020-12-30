@@ -1,4 +1,5 @@
 const Player = require('./player');
+const Map = require('./map');
 const CollisionHandler = require('../physics/collisionHandler');
 
 class Game {
@@ -6,6 +7,7 @@ class Game {
         this.sockets = [];
         this.players = [];
         this.bullets = [];
+        this.map = new Map();
         setInterval(this.update.bind(this), 1000 / 60);
         // console.log('game started');
     }
@@ -40,8 +42,13 @@ class Game {
         // move player
         Object.keys(this.players).forEach(playerId => {
             this.players[playerId].move();
+            if (this.map.isPositionLava(this.players[playerId])) {
+                console.log('Die');
+                // this.removePlayer(this.sockets[playerId]);
+            }
         });
-        
+
+
         // move bullet
         this.bullets.forEach((bullet, index) => {
             bullet.move();
@@ -52,17 +59,17 @@ class Game {
         })
 
         // collision player player
-        Object.keys(this.players).forEach(player1Id => {
-            const player1 = this.players[player1Id];
-            Object.keys(this.players).forEach(player2Id => {
-                if (player1Id !== player2Id) {
-                    const player2 = this.players[player2Id];
-                    if (CollisionHandler.circleCircleCollision(player1, player2)) {
-                        console.log('collided');
-                    }
-                }
-            })
-        })
+        // Object.keys(this.players).forEach(player1Id => {
+        //     const player1 = this.players[player1Id];
+        //     Object.keys(this.players).forEach(player2Id => {
+        //         if (player1Id !== player2Id) {
+        //             const player2 = this.players[player2Id];
+        //             if (CollisionHandler.circleCircleCollision(player1, player2)) {
+        //                 console.log('collided');
+        //             }
+        //         }
+        //     })
+        // })
 
         // collision bullet player
         this.bullets.forEach((bullet, bulletIndex) => {
@@ -71,7 +78,7 @@ class Game {
                     const player = this.players[playerId];
                     if (CollisionHandler.circleCircleCollision(bullet, player)) {
                         console.log('collide bullet');
-                        player.takeDamage(10);
+                        player.impulse(this.players[bullet.ownerId], this.bullets[bulletIndex]);
                         this.players[bullet.ownerId].inscreaseScore(1);
                         this.bullets.splice(bulletIndex, 1);
                     }

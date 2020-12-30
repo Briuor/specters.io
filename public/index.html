@@ -22,8 +22,8 @@
         let canvas = document.getElementById('canvas');
         canvas.style.background = "black"
         let ctx = canvas.getContext('2d');
-        canvas.width = 640;
-        canvas.height = 320;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
         const map = new  Map();
         const camera = new Camera(canvas.width, canvas.height);

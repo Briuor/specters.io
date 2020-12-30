@@ -3,41 +3,54 @@ const Bullet = require("./bullet");
 
 class Player {
     constructor(x, y) {
-        this.hp = 100;
-        // this.body = Matter.Bodies.circle(x, y, 24, [], 50);
-        // Matter.Body.setAngle(this.body, 0);
         this.x = x;
         this.y = y;
         this.r = 24;
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 5;
-        this.color = 'red';
+        this.color = 'white';
         this.angle = 0;
         this.score = 0;
+        this.impulsed = false;
+        this.impulseSpeed = 0.1;
+        this.impulseVel = 20;
     }
 
     move() {
         const MAP_SIZE = 1280;
-        if (this.direction.right) this.x += this.speed;
-        if (this.direction.left) this.x -= this.speed;
-        if (this.direction.up) this.y -= this.speed;
-        if (this.direction.down) this.y += this.speed;
-
+        if (this.impulsed && this.impulseVel > 0) {
+            this.impulseVel -= this.impulseSpeed;
+            this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2);
+            this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2);
+            this.impulseVel *= 0.9;
+        }
+        else {
+            if (this.direction.right) this.x += this.speed;
+            if (this.direction.left) this.x -= this.speed;
+            if (this.direction.up) this.y -= this.speed;
+            if (this.direction.down) this.y += this.speed;
+        }
         this.x = Math.max(0, Math.min(MAP_SIZE, this.x));
         this.y = Math.max(0, Math.min(MAP_SIZE, this.y));
 
+    }
+
+    prepareImpulse() {
+        this.impulseSpeed = 0.1;
+        this.impulseVel = 20;
+        this.impulsed = true;
+    }
+
+    impulse(player, bullet) {
+        this.impulseAngle = Math.atan2(bullet.y - player.y, bullet.x - player.x) + Math.PI / 2;
+        this.prepareImpulse();
     }
 
     inscreaseScore(value) {
         this.score += value;
     }
 
-    takeDamage(value) {
-        this.hp -= value;
-    }
-
     shoot(ownerId) {
-        console.log(this.x, this.y)
         return new Bullet(this.x, this.y, 10, this.angle, ownerId);
     }
 

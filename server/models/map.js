@@ -1,4 +1,4 @@
-class Map {
+module.exports = class Map {
     constructor() {
         this.cols = 40;
         this.rows = 40;
@@ -55,6 +55,6 @@ class Map {
         var tileX = Math.floor(player.x / this.tsize);
         var tileY = Math.floor(player.y / this.tsize);
 
-        return this.tiles[tileY][tileX];
+        return this.tiles[tileY * this.cols + tileX];
     }
 }
