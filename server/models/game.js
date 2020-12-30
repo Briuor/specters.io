@@ -43,11 +43,12 @@ class Game {
         Object.keys(this.players).forEach(playerId => {
             this.players[playerId].move();
             if (this.map.isPositionLava(this.players[playerId])) {
-                console.log('Die');
-                // this.removePlayer(this.sockets[playerId]);
+                if (this.sockets[playerId].id) {
+                    this.sockets[playerId].emit('disconnect');
+                    this.removePlayer(this.sockets[playerId]);
+                }
             }
         });
-
 
         // move bullet
         this.bullets.forEach((bullet, index) => {

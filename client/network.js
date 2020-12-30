@@ -1,4 +1,4 @@
-class Network {
+module.exports = class Network {
     constructor() {
         this.socket = io('ws://localhost:3000');
 
@@ -10,9 +10,10 @@ class Network {
         })
     }
 
-    connect(state) {
+    connect(state, loopRef) {
         this.connectPromise.then(() => {
             this.socket.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
+            this.socket.on('disconnect', () => { clearInterval(loopRef) })
         })
     }
 }

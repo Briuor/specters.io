@@ -1,4 +1,4 @@
-class Render {
+module.exports = class Render {
 
     drawPlayer(ctx, me) {
         // ctx.save();

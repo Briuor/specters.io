@@ -1,4 +1,4 @@
-class Map {
+module.exports = class Map {
     constructor() {
         this.cols = 40;
         this.rows = 40;

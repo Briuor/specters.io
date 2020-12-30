@@ -1,4 +1,4 @@
-class Input {
+module.exports = class Input {
     constructor(network, camera) {
         document.addEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, network));
         document.addEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, network));

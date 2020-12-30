@@ -1,5 +1,5 @@
-class Camera {
-    constructor(w, h) {
+module.exports = class Camera {
+    constructor(w, h, map) {
         this.y = 0;
         this.x = 0;
         this.w = w;

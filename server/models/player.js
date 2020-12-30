@@ -1,4 +1,3 @@
-const Matter = require('matter-js');
 const Bullet = require("./bullet");
 
 class Player {

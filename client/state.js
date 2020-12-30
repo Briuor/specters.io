@@ -1,4 +1,4 @@
-class State {
+module.exports = class State {
 
     constructor() {
         this.firstServerTimestamp = 0;

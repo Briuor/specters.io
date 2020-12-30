@@ -4,7 +4,7 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
 const PORT = 3000;
-app.use('/', express.static('public'));
+app.use('/', express.static('dist'));
 
 const Game = require('./models/game');
 let game = new Game();

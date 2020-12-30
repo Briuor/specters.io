@@ -4,14 +4,25 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "matter-js": "^0.14.2",
-    "socketio": "^1.0.0"
+    "socket.io": "^3.0.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.12.9",
+    "@babel/preset-env": "^7.12.7",
+    "babel-loader": "^8.2.2",
+    "html-webpack-plugin": "^5.0.0-alpha.14",
+    "webpack": "^5.9.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  },
   "scripts": {
-    "start": "nodemon server/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rm -r dist/* && npx webpack --config webpack.prod.js",
+    "prod": "npm run build && NODE_ENV=prod npm start",
+    "dev": "concurrently \"npx webpack --watch --config webpack.dev.js\" \"NODE_ENV=dev npm start\"",
+    "start": "nodemon ./server/app.js"
   },
   "repository": {
     "type": "git",
