@@ -11,8 +11,8 @@ let game = new Game();
 
 io.on('connection', socket => {
 
-    socket.on('join', () => {
-        game.addPlayer(socket);
+    socket.on('join', (playerName) => {
+        game.addPlayer(socket, playerName);
         console.log(socket.id + ' connected');
     });
 

@@ -1,5 +1,10 @@
 module.exports = class Render {
 
+    constructor() {
+        this.playerImage = new Image();
+        this.playerImage.src = './images/ghost2.png';
+    }
+
     drawPlayer(ctx, me) {
         // ctx.save();
         // //ROTATE

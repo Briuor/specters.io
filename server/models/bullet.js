@@ -3,7 +3,7 @@ class Bullet {
         this.x = x;
         this.y = y;
         this.r = r;
-        this.speed = 5;
+        this.speed = 10;
         this.angle = angle;
         this.ownerId = ownerId;
         this.color = "yellow";

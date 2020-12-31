@@ -35,6 +35,7 @@ module.exports = {
     </head>
       <body>
         <canvas id="canvas"></canvas>
+        <ul id="leaderboard"></ul>
         <div class="game-name">
             <img src="/images/gamename.png" />
         </div>

@@ -44,9 +44,9 @@ module.exports = class Camera {
 
     draw(ctx, map) {
         var startCol = Math.floor(this.x / map.tsize);
-        var endCol = startCol + (this.w / map.tsize);
+        var endCol = startCol + (this.w / map.tsize)+1;
         var startRow = Math.floor(this.y / map.tsize);
-        var endRow = startRow + (this.h / map.tsize);
+        var endRow = startRow + (this.h / map.tsize)+1;
         var offsetX = -this.x + startCol * map.tsize;
         var offsetY = -this.y + startRow * map.tsize;
 

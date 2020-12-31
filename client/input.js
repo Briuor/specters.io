@@ -1,9 +1,16 @@
 module.exports = class Input {
-    constructor(network, camera) {
+    listen(network, camera) {
         document.addEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, network));
         document.addEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, network));
         document.addEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove',network, camera));
         document.addEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera));
+    }
+
+    stopListen(network, camera) {
+        document.removeEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, network));
+        document.removeEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, network));
+        document.removeEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove', network, camera));
+        document.removeEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera));
     }
     
     isDirection(code) {

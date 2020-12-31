@@ -1,18 +1,21 @@
 const Bullet = require("./bullet");
 
 class Player {
-    constructor(x, y) {
+    constructor(name, x, y) {
         this.x = x;
         this.y = y;
         this.r = 24;
+        this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 5;
-        this.color = 'white';
+        this.color = '#fff';
         this.angle = 0;
         this.score = 0;
         this.impulsed = false;
         this.impulseSpeed = 0.1;
         this.impulseVel = 20;
+        this.hittedById = null;
+        this.force = 10;
     }
 
     move() {
@@ -23,12 +26,10 @@ class Player {
             this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2);
             this.impulseVel *= 0.9;
         }
-        else {
-            if (this.direction.right) this.x += this.speed;
-            if (this.direction.left) this.x -= this.speed;
-            if (this.direction.up) this.y -= this.speed;
-            if (this.direction.down) this.y += this.speed;
-        }
+        if (this.direction.right) this.x += this.speed;
+        if (this.direction.left) this.x -= this.speed;
+        if (this.direction.up) this.y -= this.speed;
+        if (this.direction.down) this.y += this.speed;
         this.x = Math.max(0, Math.min(MAP_SIZE, this.x));
         this.y = Math.max(0, Math.min(MAP_SIZE, this.y));
 
@@ -45,7 +46,7 @@ class Player {
         this.prepareImpulse();
     }
 
-    inscreaseScore(value) {
+    increaseScore(value) {
         this.score += value;
     }
 
@@ -58,6 +59,11 @@ class Player {
         let centerY = input.screen.y;
 
         this.angle = Math.atan2(input.y - centerY, input.x - centerX) + Math.PI / 2;
+    }
+
+    updateColor() {
+        let newColor = 255 - this.score;
+        this.color = `rgb(${ newColor >= 0 ? newColor : 0}, 255, 255)`
     }
 
     updateDirection(code, value) {

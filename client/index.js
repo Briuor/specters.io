@@ -10,6 +10,7 @@ window.onload = () => {
         e.preventDefault();
         playForm.style.display = 'none';
         gameName.style.display = 'none';
-        game.start();
+        console.log(name.value)
+        game.start(name.value);
     });
 }
