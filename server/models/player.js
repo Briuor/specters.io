@@ -4,7 +4,7 @@ class Player {
     constructor(name, x, y) {
         this.x = x;
         this.y = y;
-        this.r = 24;
+        this.r = 28;
         this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 5;
