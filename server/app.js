@@ -1,13 +1,22 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const http = require('http').createServer(app);
+const options = {
+    cors: true,
+    origins: ["http://127.0.0.1:80", "http://127.0.0.1:3000"],
+    transport: ['websocket']
+}
+const io = require('socket.io')(http, options);
+const Game = require('./models/game');
 
 const PORT = 3000;
 app.use('/', express.static('dist'));
+app.use(cors());
 
-const Game = require('./models/game');
-let game = new Game();
+http.listen(PORT, () => {
+    console.log('listening on *:' + PORT);
+});
 
 io.on('connection', socket => {
 
@@ -28,6 +37,4 @@ io.on('connection', socket => {
     
 });
 
-server.listen(PORT, () => {
-    console.log('Listening on Port ' + PORT);
-});
+let game = new Game();

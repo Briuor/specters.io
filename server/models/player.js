@@ -16,8 +16,8 @@ class Player {
         this.impulseVel = 20;
         this.hittedById = null;
         this.force = 10;
-        this.ack = 0;
-        
+        this.shootCooldown = 300;
+        this.shootTime = 0;
     }
 
     move() {
@@ -53,7 +53,11 @@ class Player {
     }
 
     shoot(ownerId) {
-        return new Bullet(this.x, this.y, 10, this.angle, ownerId);
+        if (Date.now() - this.shootCooldown >= this.shootTime) {
+            this.shootTime = Date.now();
+            return new Bullet(this.x, this.y, 10, this.angle, ownerId);
+        }
+        return false;
     }
 
     updateAngle(input) {

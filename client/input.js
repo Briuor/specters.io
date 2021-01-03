@@ -1,9 +1,9 @@
 module.exports = class Input {
-    listen(network, camera) {
+    listen(network, camera, render) {
         document.addEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, network));
         document.addEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, network));
-        document.addEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove',network, camera));
-        document.addEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera));
+        document.addEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove', network, camera, render));
+        document.addEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera, render));
     }
 
     stopListen(network, camera) {
@@ -22,8 +22,12 @@ module.exports = class Input {
             network.socket.emit('input', { keyCode: e.which, value, type: 'keyboard' });
     }
 
-    handleMouseInput(e, type, network, camera) {
+    handleMouseInput(e, type, network, camera, render) {
+
         if (camera.following) {
+            if (type == 'mouseclick') {
+                render.attackAnimation = render.attackAnimation ? false : true;
+            }
             console.log(camera.following.screenX, camera.following.screenY);
             network.socket.emit('input', { x: e.clientX, y: e.clientY, type, screen: { x: camera.following.screenX, y: camera.following.screenY } });
         }

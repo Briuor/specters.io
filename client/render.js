@@ -11,7 +11,9 @@ module.exports = class Render {
         this.projectileImage.src = './images/projectile.png';
         this.currentProjectileFrame = 0;
         this.animationProjectileTime = Date.now();
-        this.animationProjectileDuration = 50;
+        this.animationProjectileDuration = 100;
+
+        this.attackAnimation = false;
     }
 
     drawPlayer(ctx, me) {
@@ -20,20 +22,24 @@ module.exports = class Render {
         
         let col;
         if (angle >= 45 && angle < 135) { //right
-            col = 1;
+            col = this.attackAnimation ? 5 :  1;
         }
         else if (angle >= 135 && angle < 225) { // down
-            col = 2;
+            col = this.attackAnimation ? 6 : 2;
         }
-        else if (angle >= 225 && angle < 315) { // top
-            col = 0;
+        else if (angle >= 225 && angle < 315) { // left
+            col = this.attackAnimation ? 4 : 0;
         }
-        else { // left
-            col = 3;
+        else { // top
+            col = this.attackAnimation ? 7 : 3;
         }
+        let totalFrames = this.attackAnimation ? 3 : 5;
 
+        if (this.attackAnimation && this.currentFrame == 3 && totalFrames == 3) {
+            this.attackAnimation = false;
+        }
         if (Date.now() - this.animationDuration >= this.animationTime) {
-            this.currentFrame = this.currentFrame >= 5 ? 0 : this.currentFrame + 1;
+            this.currentFrame = this.currentFrame >= totalFrames ? 0 : this.currentFrame + 1;
             this.animationTime = Date.now();
         }
         ctx.drawImage(this.playerImage, this.currentFrame * (me.r), col*26, me.r, 26, me.screenX-me.r, me.screenY-me.r, me.r*2, me.r*2);

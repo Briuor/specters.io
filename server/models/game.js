@@ -28,7 +28,9 @@ class Game {
             }
             else if (input.type == 'mouseclick') {
                 const bullet = this.players[socket.id].shoot(socket.id);
-                this.bullets.push(bullet);
+                if (bullet) {
+                    this.bullets.push(bullet);
+                }
             }
             else if (input.type == 'keyboard') {
                 let { keyCode, value } = input;
