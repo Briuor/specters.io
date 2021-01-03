@@ -7,7 +7,7 @@ class Player {
         this.r = 28;
         this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
-        this.speed = 5;
+        this.speed = 2;
         this.color = '#fff';
         this.angle = 0;
         this.score = 0;
@@ -16,10 +16,12 @@ class Player {
         this.impulseVel = 20;
         this.hittedById = null;
         this.force = 10;
+        this.ack = 0;
+        
     }
 
     move() {
-        const MAP_SIZE = 1280;
+        const MAP_SIZE = 57*30;
         if (this.impulsed && this.impulseVel > 0) {
             this.impulseVel -= this.impulseSpeed;
             this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2);

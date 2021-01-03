@@ -1,4 +1,4 @@
-const Map = require('./map');
+const Map = require('../shared/map');
 const Camera = require('./camera');
 const State = require('./state');
 const Render = require('./render');

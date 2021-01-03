@@ -7,6 +7,8 @@ module.exports = class Camera {
         this.maxX = map.cols * map.tsize - w;
         this.maxY = map.rows * map.tsize - h;
         this.following = null;
+        this.tileSetImage = new Image();
+        this.tileSetImage.src = './images/tileset.png';
     }
 
     follow(me) {
@@ -55,17 +57,21 @@ module.exports = class Camera {
                 var tile = map.getTile(c, r);
                 var x = (c - startCol) * map.tsize + offsetX;
                 var y = (r - startRow) * map.tsize + offsetY;
-                if (tile == 1)
-                    ctx.fillStyle = '#ff0000';
-                else
-                    ctx.fillStyle = '#252525';
+                // if (tile == 1) {
+                //     ctx.fillStyle = '#ff0000';
+                //     ctx.fillRect(
+                //         Math.round(x),  // target x
+                //         Math.round(y), // target y
+                //         map.tsize, // target width
+                //         map.tsize // target height
+                //     );
+                // }
+                // else {
+                    // ctx.fillStyle = '#252525';
+                    ctx.drawImage(this.tileSetImage, (tile-1)*map.tsize, 0, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
+                // }
 
-                ctx.fillRect(
-                    Math.round(x),  // target x
-                    Math.round(y), // target y
-                    map.tsize, // target width
-                    map.tsize // target height
-                );
+                
             }
         }
     }

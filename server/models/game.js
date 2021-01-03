@@ -1,5 +1,5 @@
 const Player = require('./player');
-const Map = require('./map');
+const Map = require('../../shared/map');
 const CollisionHandler = require('../physics/collisionHandler');
 
 class Game {
@@ -13,7 +13,7 @@ class Game {
 
     addPlayer(socket, name) {
         this.sockets[socket.id] = socket;
-        this.players[socket.id] = new Player(name, 100, 100);
+        this.players[socket.id] = new Player(name, 150, 150);
     }
 
     removePlayer(socket) {

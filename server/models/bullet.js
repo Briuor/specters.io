@@ -7,6 +7,7 @@ class Bullet {
         this.angle = angle;
         this.ownerId = ownerId;
         this.color = "yellow";
+        
     }
 
     move() {
