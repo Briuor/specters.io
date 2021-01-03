@@ -40,7 +40,7 @@ module.exports = {
             <img src="/images/gamename.png" />
         </div>
         <form id="play-form">
-            <label>Hero Name </label>
+            <label>Ghost Name </label>
             <input id="name" type="text" placeholder="Guest" />
             <div class="play-btn">
             <button id="play" type="submit">Play</button>

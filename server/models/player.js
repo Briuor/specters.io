@@ -16,8 +16,10 @@ class Player {
         this.impulseVel = 20;
         this.hittedById = null;
         this.force = 10;
-        this.shootCooldown = 300;
+        this.shootCooldown = 1000;
         this.shootTime = 0;
+        this.shot = false;
+        this.sendFlag = false;
     }
 
     move() {
@@ -55,9 +57,24 @@ class Player {
     shoot(ownerId) {
         if (Date.now() - this.shootCooldown >= this.shootTime) {
             this.shootTime = Date.now();
+            this.shot = true;
             return new Bullet(this.x, this.y, 10, this.angle, ownerId);
         }
         return false;
+    }
+
+    checkShootSendFlag() {
+        if (this.sendFlag) {
+            this.sendFlag = false;
+        }
+        else {
+            this.shot = false;
+        }
+    }
+
+    startShotFlag() { 
+        this.shot = true;
+        this.sendFlag = true;
     }
 
     updateAngle(input) {

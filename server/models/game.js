@@ -29,6 +29,7 @@ class Game {
             else if (input.type == 'mouseclick') {
                 const bullet = this.players[socket.id].shoot(socket.id);
                 if (bullet) {
+                    this.players[socket.id].startShotFlag();
                     this.bullets.push(bullet);
                 }
             }
@@ -43,6 +44,9 @@ class Game {
         // move player
         Object.keys(this.players).forEach(playerId => {
             this.players[playerId].move();
+            // check shoot flag
+            this.players[playerId].checkShootSendFlag();
+            // check if died
             if (this.map.isPositionLava(this.players[playerId])) {
                 if (this.sockets[playerId]) {
                     let playerScoreId = this.players[playerId].hittedById;
@@ -51,9 +55,9 @@ class Game {
                         this.players[playerScoreId].increaseScore(10);
                         this.players[playerScoreId].updateColor();
                     }
+                    // DIE
                     this.sockets[playerId].emit('die');
                     this.removePlayer(this.sockets[playerId]);
-
                 }
             }
         });
@@ -61,7 +65,7 @@ class Game {
         // move bullet
         this.bullets.forEach((bullet, index) => {
             bullet.move();
-            if (bullet.x < 0 || bullet.x > 1240 || bullet.y < 0 || bullet.y > 1240) {
+            if (bullet.x < 0 || bullet.x > 30 * 57 || bullet.y < 0 || bullet.y > 30 * 57) {
                 this.bullets.splice(index, 1);
                 console.log('bullet removed wall collision');
             }

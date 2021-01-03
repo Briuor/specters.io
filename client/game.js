@@ -68,7 +68,7 @@ module.exports = class Game {
     start(playerName) {
         this.canvas.style.display = 'block';
         this.network.start(playerName);
-        this.input.listen(this.network, this.camera, this.render);
+        this.input.listen(this.network, this.camera);
         Promise.all([this.network.connect(this.state, this.loopRef)]).then(() => {
             setInterval(this.run.bind(this), 1000 / 60);
         });
