@@ -1,7 +1,7 @@
 class Bullet {
     constructor(x, y, r, angle, ownerId) {
-        this.x = x;
-        this.y = y;
+        this.x = x + 2 * r * Math.cos(angle - Math.PI / 2);
+        this.y = y + 2 * r * Math.sin(angle - Math.PI / 2);
         this.r = r;
         this.speed = 10;
         this.angle = angle;

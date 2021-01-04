@@ -68,7 +68,7 @@ module.exports = class Camera {
                 // }
                 // else {
                     // ctx.fillStyle = '#252525';
-                    ctx.drawImage(this.tileSetImage, (tile-1)*map.tsize, 0, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
+                    ctx.drawImage(this.tileSetImage, (tile-1)*map.tsize, 57, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
                 // }
 
                 

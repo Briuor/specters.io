@@ -12,16 +12,42 @@ module.exports = class Game {
         this.canvas.style.background = "black"
 
         this.ctx = this.canvas.getContext('2d');
-        this.canvas.width = window.innerWidth-4;
-        this.canvas.height = window.innerHeight-4;
+        this.gameWidth = 1366;
+        this.gameHeight = 702;
+        this.cwidth = window.innerWidth - 4;
+        this.cheight = window.innerHeight - 4;
+
+        this.canvas.width = this.cwidth;
+        this.canvas.height = this.cheight;
+
+        // this.resizeCanvas.bind(this);
+        // window.addEventListener("resize", () => { this.resizeCanvas(); });
         
         this.map = new Map();
-        this.camera = new Camera(this.canvas.width, this.canvas.height, this.map);
+        this.camera = new Camera(this.cwidth, this.cheight, this.map);
         this.state = new State();
         this.network = new Network();
         this.render = new Render();
         this.input = new Input();
         this.loopRef = null;
+        // this.resizeCanvas();
+    }
+
+    resizeCanvas() {
+        this.cwidth = window.innerWidth - 4;
+        this.cheight = window.innerHeight - 4;
+
+        this.canvas.width = this.gameWidth;
+        this.canvas.height = this.gameHeight;
+
+        this.canvas.style.width = '' + this.cwidth + 'px';
+        this.canvas.style.height = '' + this.cheight + 'px';
+
+        this.ctx.mozImageSmoothingEnabled = false;
+        this.ctx.webkitImageSmoothingEnabled = false;
+        this.ctx.msImageSmoothingEnabled = false;
+        this.ctx.imageSmoothingEnabled = false;
+        
     }
 
     removeChilds(node) {

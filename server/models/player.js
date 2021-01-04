@@ -16,7 +16,7 @@ class Player {
         this.impulseVel = 20;
         this.hittedById = null;
         this.force = 10;
-        this.shootCooldown = 1000;
+        this.shootCooldown = 600;
         this.shootTime = 0;
         this.shot = false;
         this.sendFlag = false;

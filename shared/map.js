@@ -42,7 +42,7 @@ module.exports = class Map {
 
     isPositionLava(player) {
         var tileX = Math.floor(player.x / this.tsize);
-        var tileY = Math.floor(player.y / this.tsize);
+        var tileY = Math.floor((player.y+20) / this.tsize);
 
         return this.tiles[tileY * this.cols + tileX] == 11;
     }

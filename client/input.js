@@ -26,6 +26,7 @@ module.exports = class Input {
 
         if (camera.following) {
             console.log(camera.following.screenX, camera.following.screenY);
+            console.log('x: ', e.clientX);
             network.socket.emit('input', { x: e.clientX, y: e.clientY, type, screen: { x: camera.following.screenX, y: camera.following.screenY } });
         }
     }
