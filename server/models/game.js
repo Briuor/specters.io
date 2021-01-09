@@ -3,17 +3,21 @@ const Map = require('../../shared/map');
 const CollisionHandler = require('../physics/collisionHandler');
 
 class Game {
-    constructor() {
+    constructor(io) {
+        this.io = io;
         this.sockets = [];
         this.players = [];
         this.bullets = [];
         this.map = new Map();
         setInterval(this.update.bind(this), 1000 / 60);
+        this.lastUpdateTime = Date.now();
     }
 
     addPlayer(socket, name) {
         this.sockets[socket.id] = socket;
-        this.players[socket.id] = new Player(name, 150, 150);
+        const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
+        let { x, y } = respawnList[Math.round(Math.random() * 2)];
+        this.players[socket.id] = new Player(socket.id, name, x, y);
     }
 
     removePlayer(socket) {
@@ -29,7 +33,7 @@ class Game {
             else if (input.type == 'mouseclick') {
                 const bullet = this.players[socket.id].shoot(socket.id);
                 if (bullet) {
-                    this.players[socket.id].startShotFlag();
+                    this.io.sockets.emit('attack', socket.id);
                     this.bullets.push(bullet);
                 }
             }
@@ -41,33 +45,39 @@ class Game {
     }
 
     update() {
+        let now = Date.now();
+        let dt = (now - this.lastUpdateTime) / 1000;
+        this.lastUpdateTime = now;
         // move player
         Object.keys(this.players).forEach(playerId => {
-            this.players[playerId].move();
-            // check shoot flag
-            this.players[playerId].checkShootSendFlag();
-            // check if died
-            if (this.map.isPositionLava(this.players[playerId])) {
-                if (this.sockets[playerId]) {
-                    let playerScoreId = this.players[playerId].hittedById;
-                    // if was hitted
-                    if (playerScoreId && this.players[playerScoreId]) {
-                        this.players[playerScoreId].increaseScore(10);
-                        this.players[playerScoreId].updateColor();
+            if (this.players[playerId].checkDie()) {
+                this.removePlayer(this.sockets[playerId]);
+            }
+            else if (this.players[playerId] && !this.players[playerId].die) {
+                this.players[playerId].move(dt);
+                // check if died
+                if (this.map.isPositionLava(this.players[playerId])) {
+                    if (this.sockets[playerId]) {
+                        let playerScoreId = this.players[playerId].hittedById;
+                        // if was hitted
+                        if (playerScoreId && this.players[playerScoreId]) {
+                            this.players[playerScoreId].increaseScore(1);
+                            this.players[playerScoreId].updateColor();
+                        }
+                        // DIE
+                        this.io.sockets.emit('die', playerId);
+                        this.players[playerId].die = true;
+                        this.players[playerId].dieTime = Date.now();
                     }
-                    // DIE
-                    this.sockets[playerId].emit('die');
-                    this.removePlayer(this.sockets[playerId]);
                 }
             }
         });
 
         // move bullet
         this.bullets.forEach((bullet, index) => {
-            bullet.move();
-            if (bullet.x < 0 || bullet.x > 30 * 57 || bullet.y < 0 || bullet.y > 30 * 57) {
+            bullet.move(dt);
+            if (bullet.x < 0 || bullet.x > 50 * 57 || bullet.y < 0 || bullet.y > 50 * 57) {
                 this.bullets.splice(index, 1);
-                console.log('bullet removed wall collision');
             }
         })
 
@@ -77,7 +87,6 @@ class Game {
                 if (bullet.ownerId != playerId) {
                     const player = this.players[playerId];
                     if (CollisionHandler.circleCircleCollision(bullet, player)) {
-                        console.log('collide bullet');
                         player.impulse(this.players[bullet.ownerId], this.bullets[bulletIndex]);
                         player.hittedById = bullet.ownerId;
                         this.bullets.splice(bulletIndex, 1);

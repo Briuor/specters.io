@@ -8,19 +8,23 @@
     font-size: 1.1em;
 }
 
+.center {
+    text-align: center;
+}
+
 body {
     margin: 0;
     background-color: #252525;
     color: #fff;
 }
 
-.game-name {
-    text-align: center;
+div.game-name {
     margin-top: 120px;
 }
 
 canvas {
     display: none;
+    margin: 0 auto;
 }
 
 form#play-form {
@@ -47,7 +51,7 @@ button#play:hover {
   background-color: #af0404;
 }
 
-input#name {
+input.name {
   padding-left: 10px;
   display: block;
   width: 100%;
@@ -56,10 +60,20 @@ input#name {
   border: none;
 }
 
-ul#leaderboard {
+div.leaderboard-wrapper {
   position: absolute;
   right: 20px;
   top: 0;
+  text-align: center;
+   -moz-user-select: none; 
+  -webkit-user-select: none;
+  -ms-user-select:none;
+  user-select:none;
+  -o-user-select:none;
+}
+
+ul#leaderboard {
+  width: 200px;
   -moz-user-select: none; 
   -webkit-user-select: none;
   -ms-user-select:none;
@@ -68,4 +82,34 @@ ul#leaderboard {
   margin: 0;
   padding: 0;
   list-style-type: none;
+  font-size: 1em;
+}
+
+li {
+  text-align: left;
+}
+span.leaderboard-score {
+float: right;
+}
+
+div#play-again-modal {
+  position: absolute;
+  background: #fff;
+  color: #000;
+  left: 50%;
+  top:50%;
+  transform: translate(-50%, -50%);
+  padding: 30px;
+  border-radius: 5px;
+  display: none;
+}
+
+div#play-again-modal input{
+  border: 3px solid #000;
+}
+
+div#play-again-modal p.kills{
+  text-align: center;
+  color: #ff0000;
+  font-size: 1.3em;
 }

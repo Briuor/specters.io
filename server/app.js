@@ -37,4 +37,4 @@ io.on('connection', socket => {
     
 });
 
-let game = new Game();
+let game = new Game(io);

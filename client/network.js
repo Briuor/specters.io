@@ -12,13 +12,15 @@ module.exports = class Network {
         })
     }
 
-    connect(state, loopRef) {
+    connect(state, loopRef, render) {
         this.connectPromise.then(() => {
             this.socket.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
             this.socket.on('disconnect', () => { clearInterval(loopRef) })
-            this.socket.on('die', () => {
-                this.socket.emit('disconnect');
-                clearInterval(loopRef);
+            this.socket.on('attack', (id) => {
+                render.attackList.push(id);
+            })
+            this.socket.on('die', (id) => {
+                render.dieList.push(id);
             })
         })
     }

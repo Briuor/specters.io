@@ -1,47 +1,50 @@
 const Bullet = require("./bullet");
 
 class Player {
-    constructor(name, x, y) {
+    constructor(id, name, x, y) {
+        this.id = id;
         this.x = x;
         this.y = y;
         this.r = 28;
         this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
-        this.speed = 2;
+        this.speed = 180;
         this.color = '#fff';
         this.angle = 0;
         this.score = 0;
         this.impulsed = false;
-        this.impulseSpeed = 0.1;
-        this.impulseVel = 20;
+        this.impulseSpeed = 0.1*80;
+        this.impulseVel = 20*80;
         this.hittedById = null;
-        this.force = 10;
+        this.force = 320;
         this.shootCooldown = 600;
         this.shootTime = 0;
         this.shot = false;
         this.sendFlag = false;
+        this.die = false;
+        this.dieDelay = 600;
+        this.dieTime = 0;
     }
 
-    move() {
-        const MAP_SIZE = 57*30;
+    move(dt) {
+        const MAP_SIZE = 57*50;
         if (this.impulsed && this.impulseVel > 0) {
             this.impulseVel -= this.impulseSpeed;
-            this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2);
-            this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2);
+            this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2) * dt;
+            this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2) * dt;
             this.impulseVel *= 0.9;
         }
-        if (this.direction.right) this.x += this.speed;
-        if (this.direction.left) this.x -= this.speed;
-        if (this.direction.up) this.y -= this.speed;
-        if (this.direction.down) this.y += this.speed;
+        if (this.direction.right) this.x += this.speed * dt;
+        if (this.direction.left) this.x -= this.speed * dt;
+        if (this.direction.up) this.y -= this.speed * dt;
+        if (this.direction.down) this.y += this.speed * dt;
         this.x = Math.max(0, Math.min(MAP_SIZE, this.x));
         this.y = Math.max(0, Math.min(MAP_SIZE, this.y));
-
     }
 
     prepareImpulse() {
-        this.impulseSpeed = 0.1;
-        this.impulseVel = 20;
+        this.impulseSpeed = 0.1*80;
+        this.impulseVel = 20*80;
         this.impulsed = true;
     }
 
@@ -63,19 +66,13 @@ class Player {
         return false;
     }
 
-    checkShootSendFlag() {
-        if (this.sendFlag) {
-            this.sendFlag = false;
+    checkDie() {
+        if (this.die && Date.now() - this.dieDelay >= this.dieTime) {
+            return true;
         }
-        else {
-            this.shot = false;
-        }
+        return false;
     }
 
-    startShotFlag() { 
-        this.shot = true;
-        this.sendFlag = true;
-    }
 
     updateAngle(input) {
         let centerX = input.screen.x;

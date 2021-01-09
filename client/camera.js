@@ -27,20 +27,20 @@ module.exports = class Camera {
         this.y = this.following.y - this.h / 2;
 
         // Fixa os valores
-        this.x = Math.max(0, Math.min(this.x, this.maxX));
-        this.y = Math.max(0, Math.min(this.y, this.maxY));
+        // this.x = Math.max(0, Math.min(this.x, this.maxX));
+        // this.y = Math.max(-12*57, Math.min(this.y, this.maxY));
 
         // left right limits
-        if (this.following.x < this.w / 2 ||
-            this.following.x > this.maxX + this.w / 2) {
-            this.following.screenX = this.following.x - this.x;
-        }
+        // if (this.following.x < this.w / 2 ||
+        //     this.following.x > this.maxX + this.w / 2) {
+        //     this.following.screenX = this.following.x - this.x;
+        // }
 
-        // top bottom limits
-        if (this.following.y < this.h / 2 ||
-            this.following.y > this.maxY + this.h / 2) {
-            this.following.screenY = this.following.y - this.y;
-        }
+        // // top bottom limits
+        // if (this.following.y < this.h / 2 ||
+        //     this.following.y > this.maxY + this.h / 2) {
+        //     this.following.screenY = this.following.y - this.y;
+        // }
 
     }
 
@@ -57,21 +57,18 @@ module.exports = class Camera {
                 var tile = map.getTile(c, r);
                 var x = (c - startCol) * map.tsize + offsetX;
                 var y = (r - startRow) * map.tsize + offsetY;
-                // if (tile == 1) {
-                //     ctx.fillStyle = '#ff0000';
-                //     ctx.fillRect(
-                //         Math.round(x),  // target x
-                //         Math.round(y), // target y
-                //         map.tsize, // target width
-                //         map.tsize // target height
-                //     );
-                // }
-                // else {
-                    // ctx.fillStyle = '#252525';
-                    ctx.drawImage(this.tileSetImage, (tile-1)*map.tsize, 57, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
-                // }
-
                 
+
+                let ty = 0;
+                if (typeof tile === 'undefined' )
+                    ctx.drawImage(this.tileSetImage, (11 - 1) * map.tsize, 0, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
+                else {
+                    if (tile > 17) {
+                        tile = (tile % 17);
+                        ty = 1;
+                    }
+                    ctx.drawImage(this.tileSetImage, (tile - 1) * map.tsize, ty * 57, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
+                }
             }
         }
     }
