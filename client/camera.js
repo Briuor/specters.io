@@ -25,6 +25,7 @@ module.exports = class Camera {
         // camera follow the player
         this.x = this.following.x - this.w / 2;
         this.y = this.following.y - this.h / 2;
+        // console.log(this.following.x, this.following.y)
 
         // Fixa os valores
         // this.x = Math.max(0, Math.min(this.x, this.maxX));

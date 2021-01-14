@@ -5,7 +5,6 @@ module.exports = class Network {
 
         this.connectPromise = new Promise(resolve => {
             this.socket.on('connect', () => {
-                console.log(this.name);
                 this.socket.emit('join', this.name);
                 resolve();
             });

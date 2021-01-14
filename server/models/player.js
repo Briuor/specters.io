@@ -27,7 +27,7 @@ class Player {
     }
 
     serialize() {
-        return { id: this.id, x: this.x, y: this.y, angle: this.angle };
+        return { id: this.id, x: Number(this.x.toFixed(2)), y: Number(this.y.toFixed(2)), angle: Number(this.angle.toFixed(2)) };
     }
 
     leaderBoardSerialize() {

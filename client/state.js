@@ -31,6 +31,7 @@ module.exports = class State {
         const base = this.getBaseUpdate();
         const serverTime = this.currentServerTime();
 
+        console.log(this.updates.length)
         if (base < 0 || base === this.updates.length - 1) {
             return this.updates[this.updates.length - 1];
         } else {
@@ -55,7 +56,7 @@ module.exports = class State {
         Object.keys(object1).forEach(key => {
             if (key == 'x' || key == 'y')
                 interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;
-            else if (key == 'color' || key == 'r' || key == 'angle' || key == 'id') {
+            else if (key == 'angle' || key == 'id') {
                 interpolated[key] = object2[key];
             }
         });

@@ -116,6 +116,7 @@ module.exports = class Game {
         const { me, otherPlayers, bullets, leaderBoard } = this.state.getCurrentState();
 
         if (!me) return;
+        console.log(bullets)
         this.camera.follow(me);
         this.camera.update();
         this.camera.following.scX = this.cwidth / 2;

@@ -58,7 +58,6 @@ module.exports = class Render {
             this.dieAnimation = true;
             this.dieList.splice(this.dieList.findIndex(id => me.id == id), 1);
         }
-
         else {
             if (angle >= 45 && angle < 135) { //right
                 col = this.attackAnimation ? 5 : 1;
