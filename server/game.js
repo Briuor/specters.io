@@ -1,6 +1,6 @@
-const Player = require('./player');
-const Map = require('../../shared/map');
-const CollisionHandler = require('../physics/collisionHandler');
+const Player = require('./models/player');
+const Map = require('../shared/map');
+const CollisionHandler = require('./physics/collisionHandler');
 
 class Game {
     constructor(io) {
@@ -9,8 +9,8 @@ class Game {
         this.players = [];
         this.bullets = [];
         this.map = new Map();
-        setInterval(this.update.bind(this), 1000 / 60);
         this.lastUpdateTime = Date.now();
+        setInterval(this.update.bind(this), 1000 / 60);
     }
 
     addPlayer(socket, name) {
@@ -97,14 +97,16 @@ class Game {
 
         // send update event to each client
         Object.keys(this.sockets).forEach(socketId => {
-            let me = this.players[socketId];
-            let otherPlayers = Object.values(this.players).filter(p => p !== me);
-            let leaderBoard = Object.values(this.players).sort((a, b) => {
+            let me = this.players[socketId].serialize();
+            let otherPlayers = Object.values(this.players).filter(p => p.id !== me.id).map(p => p.serialize());
+            let leaderBoard = Object.values(this.players).map(p => p.leaderBoardSerialize())
+                .sort((a, b) => {
                 if (a && b) {
                     return a.score - b.score;
                 }
-            })
-            this.sockets[socketId].emit('update', { t: Date.now(), me, otherPlayers, bullets: this.bullets, leaderBoard });
+            }).splice(0, 10);
+            let bullets = this.bullets.map(b => b.serialize());
+            this.sockets[socketId].emit('update', { t: Date.now(), me, otherPlayers, bullets, leaderBoard });
         });
     }
 }

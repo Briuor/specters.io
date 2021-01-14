@@ -11,6 +11,7 @@ module.exports = class Render {
         this.currentFrame = 0;
         this.animationTime = Date.now();
         this.animationDuration = 100;
+        this.meRay = 28;
         // me attack
         this.attackAnimation = false;
         this.dieAnimation = false;
@@ -18,7 +19,7 @@ module.exports = class Render {
         // other
         this.ocurrentFrame = {};
         this.oanimationTime = {}
-        this.oanimationDuration = 80;
+        this.oanimationDuration = 100;
         // other attack
         this.oattackAnimation = {};
         this.odieAnimation = {};
@@ -29,15 +30,16 @@ module.exports = class Render {
         this.currentProjectileFrame = 0;
         this.animationProjectileTime = Date.now();
         this.animationProjectileDuration = 400;
+        this.bulletRay = 10;
 
 
     }
 
     drawPlayer(ctx, me, gameOver) {
-        ctx.fillStyle = me.color;
-        ctx.beginPath();
-        ctx.arc(me.screenX, me.screenY, me.r, 0, 2 * Math.PI);
-        ctx.fill();
+        // ctx.fillStyle = me.color;
+        // ctx.beginPath();
+        // ctx.arc(me.screenX, me.screenY, me.r, 0, 2 * Math.PI);
+        // ctx.fill();
 
         let col;
         let angle = (180 * me.angle) / Math.PI; 
@@ -89,19 +91,20 @@ module.exports = class Render {
         if (this.attackAnimation && this.currentFrame == totalFrames && totalFrames == 3) {
             this.attackAnimation = false;
         }
-        ctx.drawImage(this.playerImage, this.currentFrame * (me.r), col*26, me.r, 26, me.screenX-me.r, me.screenY-me.r, me.r*2, me.r*2);
+        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col*26, this.meRay, 26, me.screenX-this.meRay, me.screenY-this.meRay, this.meRay*2, this.meRay*2);
     }
 
     drawPlayers(ctx, otherPlayers, bullets, camera) {
         otherPlayers.forEach((p, index) => this.drawOther(ctx, p, camera, p.id));
+        console.log('Other: ', otherPlayers)
         bullets.forEach(b => this.drawBullet(ctx, b, camera));
     }
 
     drawOther(ctx, p, camera, index) {
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
-        ctx.fill();
+        // ctx.fillStyle = p.color;
+        // ctx.beginPath();
+        // ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
+        // ctx.fill();
 
         if (this.oanimationTime[index] == null ) {
             this.oanimationTime[index] = 0;
@@ -155,14 +158,14 @@ module.exports = class Render {
         if (this.oattackAnimation[index] && this.ocurrentFrame[index] == 3 && totalFrames == 3) {
             this.oattackAnimation[index] = false;
         }
-        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (p.r), col * 26, p.r, 26, p.x - p.r - camera.x, p.y - p.r - camera.y, p.r * 2, p.r * 2);
+        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - this.meRay - camera.x, p.y - this.meRay - camera.y, this.meRay * 2, this.meRay * 2);
     }
 
     drawBullet(ctx, p, camera) {
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
-        ctx.fill();
+        // ctx.fillStyle = p.color;
+        // ctx.beginPath();
+        // ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
+        // ctx.fill();
 
         ctx.save();
         ctx.translate(p.x - camera.x, p.y - camera.y);
@@ -172,24 +175,7 @@ module.exports = class Render {
             this.currentProjectileFrame = this.currentProjectileFrame >= 3 ? 0 : this.currentProjectileFrame + 1;
             this.animationProjectileTime = Date.now();
         }
-        ctx.drawImage(this.projectileImage, this.currentProjectileFrame * p.r, 0, p.r, p.r, p.x - p.r - camera.x, p.y - p.r - camera.y, p.r*2, p.r*2);
-        ctx.restore();
-    }
-
-    drawRect(ctx, { color, x, y, w, h, angle }) {
-        ctx.save();
-        //ROTATE
-        ctx.translate(x + w / 2, y + h / 2);
-        ctx.rotate(angle);
-        ctx.translate(-(x + w / 2), -(y + h / 2));
-        //draw RECT
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, w, h);
-        //draw LINE
-        ctx.beginPath();
-        ctx.moveTo(x + w / 2, y + h / 2);
-        ctx.lineTo(x + w / 2, (y + h / 2) - 10);
-        ctx.stroke();
+        ctx.drawImage(this.projectileImage, this.currentProjectileFrame * this.bulletRay, 0, this.bulletRay, this.bulletRay, p.x - this.bulletRay - camera.x, p.y - this.bulletRay - camera.y, this.bulletRay*2, this.bulletRay*2);
         ctx.restore();
     }
 }

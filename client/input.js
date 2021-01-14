@@ -2,8 +2,8 @@ module.exports = class Input {
     listen(network, camera, canvas) {
         document.addEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, network));
         document.addEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, network));
-        document.addEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove', network, camera, canvas));
-        document.addEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera, canvas));
+        document.addEventListener('mousemove', (e) => this.handleMouseInput(e, 'mousemove', network, camera, canvas), true);
+        document.addEventListener('click', (e) => this.handleMouseInput(e, 'mouseclick', network, camera, canvas), true);
     }
 
     stopListen(network, camera) {

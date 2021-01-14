@@ -6,11 +6,14 @@ class Bullet {
         this.x = x + 2 * r * Math.cos(angle - Math.PI / 2);
         this.y = y + 2 * r * Math.sin(angle - Math.PI / 2);
         this.r = r;
-        this.speed = 700;
+        this.speed = 600;
         this.angle = angle;
         this.ownerId = ownerId;
         this.color = "yellow";
-        
+    }
+
+    serialize() {
+        return { id: this.id, x: this.x, y: this.y, angle: this.angle };
     }
 
     move(dt) {

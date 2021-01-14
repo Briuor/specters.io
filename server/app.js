@@ -8,7 +8,7 @@ const options = {
     transport: ['websocket']
 }
 const io = require('socket.io')(http, options);
-const Game = require('./models/game');
+const Game = require('./game');
 
 const PORT = 3000;
 app.use('/', express.static('dist'));

@@ -26,6 +26,14 @@ class Player {
         this.dieTime = 0;
     }
 
+    serialize() {
+        return { id: this.id, x: this.x, y: this.y, angle: this.angle };
+    }
+
+    leaderBoardSerialize() {
+        return { name: this.name, score: this.score };
+    }
+
     move(dt) {
         const MAP_SIZE = 57*50;
         if (this.impulsed && this.impulseVel > 0) {

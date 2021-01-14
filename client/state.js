@@ -53,7 +53,7 @@ module.exports = class State {
 
         const interpolated = {};
         Object.keys(object1).forEach(key => {
-            if (key == 'x' || key == 'y' || key == 'screenX' || key == 'screenY')
+            if (key == 'x' || key == 'y')
                 interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;
             else if (key == 'color' || key == 'r' || key == 'angle' || key == 'id') {
                 interpolated[key] = object2[key];
