@@ -6,6 +6,7 @@ module.exports = class Render {
         this.attackList = [];
         this.dieList = [];
         // me
+        this.meId = '';
         this.playerImage = new Image();
         this.playerImage.src = './images/ghost2.png';
         this.currentFrame = 0;
@@ -46,17 +47,17 @@ module.exports = class Render {
         if (angle < 0) angle = 360 + angle;
 
 
-        if (this.attackList.length > 0 && this.attackList.includes(me.id)) {
+        if (this.attackList.length > 0 && this.attackList.includes(this.meId)) {
             this.currentFrame = 0;
             this.attackAnimation = true;
-            this.attackList.splice(this.attackList.findIndex(id => me.id == id), 1);
+            this.attackList.splice(this.attackList.findIndex(id => this.meId == id), 1);
         }
 
-        if (this.dieList.length > 0 && this.dieList.includes(me.id)) {
+        if (this.dieList.length > 0 && this.dieList.includes(this.meId)) {
             this.attackAnimation = false;
             this.currentFrame = 0;
             this.dieAnimation = true;
-            this.dieList.splice(this.dieList.findIndex(id => me.id == id), 1);
+            this.dieList.splice(this.dieList.findIndex(id => this.meId == id), 1);
         }
         else {
             if (angle >= 45 && angle < 135) { //right
@@ -95,7 +96,6 @@ module.exports = class Render {
 
     drawPlayers(ctx, otherPlayers, bullets, camera) {
         otherPlayers.forEach((p, index) => this.drawOther(ctx, p, camera, p.id));
-        console.log('Other: ', otherPlayers)
         bullets.forEach(b => this.drawBullet(ctx, b, camera));
     }
 

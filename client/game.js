@@ -7,6 +7,7 @@ const Network = require('./network');
 
 module.exports = class Game {
     constructor() {
+        this.meId = null;
         this.leaderBoard = document.getElementById('leaderboard');
         this.playAgainModal = document.getElementById('play-again-modal');
         this.playAgainForm = document.getElementById('play-again-form');
@@ -116,7 +117,6 @@ module.exports = class Game {
         const { me, otherPlayers, bullets, leaderBoard } = this.state.getCurrentState();
 
         if (!me) return;
-        console.log(bullets)
         this.camera.follow(me);
         this.camera.update();
         this.camera.following.scX = this.cwidth / 2;
@@ -135,8 +135,9 @@ module.exports = class Game {
     start(playerName) {
         this.canvas.style.display = 'block';
         this.network.start(playerName);
+
         this.input.listen(this.network, this.camera, this.canvas);
-        Promise.all([this.network.connect(this.state, this.loopRef, this.render)]).then(() => {
+        Promise.all([this.network.connect(this.state, this.loopRef, this.render, this.meId)]).then(() => {
             this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
         });
     }

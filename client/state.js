@@ -31,7 +31,6 @@ module.exports = class State {
         const base = this.getBaseUpdate();
         const serverTime = this.currentServerTime();
 
-        console.log(this.updates.length)
         if (base < 0 || base === this.updates.length - 1) {
             return this.updates[this.updates.length - 1];
         } else {
@@ -67,8 +66,31 @@ module.exports = class State {
         return objects1.map(o => this.interpolateObject(o, objects2.find(o2 => o.id === o2.id), ratio));
     }
 
+    deserialize(updateBuffer) {
+        let me = this.deserializeMe(updateBuffer[0]);
+        // console.log(updateBuffer[1])
+        let otherPlayers = updateBuffer[1].map(buffer => this.deserializeGameObj(buffer));
+        let bullets = updateBuffer[2].map(buffer => this.deserializeGameObj(buffer));
+        let leaderBoard = updateBuffer[3].map(buffer => this.deserializeLeaderBoard(buffer));
+        let t = updateBuffer[4];
+        return { me, otherPlayers, bullets, leaderBoard, t };
+    }
 
-    handleUpdate(newUpdate) {
+    deserializeMe(buffer) {
+        return { x: buffer[0], y: buffer[1], angle: buffer[2] };
+    }
+
+
+    deserializeGameObj(buffer) {
+        return { id: buffer[0], x: buffer[1], y: buffer[2], angle: buffer[3] };
+    }
+
+    deserializeLeaderBoard(buffer) {
+        return { name: buffer[0], score: buffer[1] };
+    }
+
+    handleUpdate(updateBuffer) {
+        const newUpdate = this.deserialize(updateBuffer);
         if (!this.firstServerTimestamp) {
             this.firstServerTimestamp = newUpdate.t;
             this.gameStart = Date.now();

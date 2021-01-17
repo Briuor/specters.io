@@ -25,13 +25,16 @@ class Player {
         this.dieDelay = 600;
         this.dieTime = 0;
     }
+    serializeMe() {
+        return [Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2))];
+    }
 
     serialize() {
-        return { id: this.id, x: Number(this.x.toFixed(2)), y: Number(this.y.toFixed(2)), angle: Number(this.angle.toFixed(2)) };
+        return [this.id, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)),Number(this.angle.toFixed(2))];
     }
 
     leaderBoardSerialize() {
-        return { name: this.name, score: this.score };
+        return [this.name, this.score];
     }
 
     move(dt) {
@@ -104,6 +107,12 @@ class Player {
         else if (code == 87 || code == 38)
             this.direction.up = value;
     }
+
+     distanceTo(object) {
+    const dx = this.x - object.x;
+    const dy = this.y - object.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
 }
 
 module.exports = Player;

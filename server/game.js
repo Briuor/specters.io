@@ -1,6 +1,7 @@
 const Player = require('./models/player');
 const Map = require('../shared/map');
 const CollisionHandler = require('./physics/collisionHandler');
+const msgpack = require("msgpack-lite");
 
 class Game {
     constructor(io) {
@@ -9,6 +10,8 @@ class Game {
         this.players = [];
         this.bullets = [];
         this.map = new Map();
+        this.gameWidth = 1280;
+        this.gameHeight = 720;
         this.lastUpdateTime = Date.now();
         setInterval(this.update.bind(this), 1000 / 60);
     }
@@ -97,16 +100,24 @@ class Game {
 
         // send update event to each client
         Object.keys(this.sockets).forEach(socketId => {
-            let me = this.players[socketId].serialize();
-            let otherPlayers = Object.values(this.players).filter(p => p.id !== me.id).map(p => p.serialize());
+            const nearbyPlayers = Object.values(this.players).filter(
+                p => p !== this.players[socketId] && p.distanceTo(this.players[socketId]) <= this.gameWidth / 2,
+            );
+            const nearbyBullets = this.bullets.filter(
+                b => b.distanceTo(this.players[socketId]) <= this.gameWidth / 2,
+            );
+            let me = this.players[socketId].serializeMe();
+            let otherPlayers = nearbyPlayers.filter(p => p.id !== socketId).map(p => p.serialize());
             let leaderBoard = Object.values(this.players).map(p => p.leaderBoardSerialize())
                 .sort((a, b) => {
                 if (a && b) {
                     return a.score - b.score;
                 }
             }).splice(0, 10);
-            let bullets = this.bullets.map(b => b.serialize());
-            this.sockets[socketId].emit('update', { t: Date.now(), me, otherPlayers, bullets, leaderBoard });
+            let bullets = nearbyBullets.map(b => b.serialize());
+            let msg = [me, otherPlayers, bullets, leaderBoard, Date.now()];
+            // msg = { t: Date.now(), me, otherPlayers, bullets, leaderBoard };
+            this.sockets[socketId].emit('update', msg);
         });
     }
 }

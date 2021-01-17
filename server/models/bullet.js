@@ -13,12 +13,18 @@ class Bullet {
     }
 
     serialize() {
-        return { id: this.id, x: Number(this.x.toFixed(2)), y: Number(this.y.toFixed(2)), angle: Number(this.angle.toFixed(5)) };
+        return [this.id, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2))];
     }
 
     move(dt) {
         this.x += Math.cos(this.angle - Math.PI / 2) * this.speed * dt;
         this.y += Math.sin(this.angle - Math.PI / 2) * this.speed * dt;
+    }
+
+    distanceTo(object) {
+        const dx = this.x - object.x;
+        const dy = this.y - object.y;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 }
 
