@@ -4,6 +4,8 @@ const State = require('./state');
 const Render = require('./render');
 const Input = require('./input');
 const Network = require('./network');
+const { Howl, Howler } = require('howler');
+
 
 module.exports = class Game {
     constructor() {
@@ -32,10 +34,43 @@ module.exports = class Game {
         this.resizeCanvas.bind(this);
         window.addEventListener("resize", () => { this.resizeCanvas(); });
 
+        
+
         this.init();
     }
 
     init() {
+        this.attackSound = new Howl({
+            src: ['./sounds/attack.mp3'],
+            volume: 1,
+        });
+        this.dieSound = new Howl({
+            src: ['./sounds/die.mp3'],
+            volume: 1,
+        });
+        this.lavaSound = new Howl({
+            src: ['./sounds/lava.mp3'],
+            volume: 0.3,
+            loop: true,
+            onend: function () {
+                console.log('Finished!');
+            }
+        });
+        this.windSound = new Howl({
+            src: ['./sounds/wind.ogg'],
+            volume: 0.1,
+            loop: true,
+            onend: function () {
+                console.log('Finished!');
+            }
+        });
+        this.dieSound = new Howl({
+            src: ['./sounds/die.mp3'],
+            volume: 0.5,
+            onend: function () {
+                console.log('Finished!');
+            }
+        });
         this.map = new Map();
         this.camera = new Camera(this.gameWidth, this.gameHeight, this.map);
         this.state = new State();
@@ -44,6 +79,8 @@ module.exports = class Game {
         this.input = new Input();
         this.loopRef = null;
         this.gameOver = this.gameOver.bind(this);
+        
+
         this.resizeCanvas();
     }
 
@@ -126,8 +163,8 @@ module.exports = class Game {
 
         // draw
         this.camera.draw(this.ctx, this.map);
-        this.render.drawPlayer(this.ctx, me, this.gameOver);
-        this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera);
+        this.render.drawPlayer(this.ctx, me, this.gameOver, this.attackSound, this.dieSound);
+        this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
         this.updateLeaderBoard(leaderBoard);
     }
 
@@ -138,6 +175,8 @@ module.exports = class Game {
         this.input.listen(this.network, this.camera, this.canvas);
         Promise.all([this.network.connect(this.state, this.loopRef, this.render, this.meId)]).then(() => {
             this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
+            this.lavaSound.play();
+            this.windSound.play();
         });
     }
 }
