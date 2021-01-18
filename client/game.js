@@ -7,7 +7,6 @@ const Network = require('./network');
 
 module.exports = class Game {
     constructor() {
-        this.meId = null;
         this.leaderBoard = document.getElementById('leaderboard');
         this.playAgainModal = document.getElementById('play-again-modal');
         this.playAgainForm = document.getElementById('play-again-form');

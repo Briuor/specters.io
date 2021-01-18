@@ -13,7 +13,15 @@ window.onload = () => {
         gameName.style.display = 'none';
         body.style.background = '#000';
         body.style.cursor = 'crosshair';
-        localStorage.setItem('name', name.value);
-        game.start(name.value);
+        game.start(validateName(name.value));
     });
+}
+
+function validateName(name) {
+    let nameNoSpace = name.trim();
+    console.log(nameNoSpace)
+    nameNoSpace = nameNoSpace === "" ? 'Unammed' : nameNoSpace;
+    localStorage.removeItem('name');
+    localStorage.setItem('name', nameNoSpace);
+    return nameNoSpace;
 }

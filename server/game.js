@@ -101,13 +101,14 @@ class Game {
         // send update event to each client
         Object.keys(this.sockets).forEach(socketId => {
             const nearbyPlayers = Object.values(this.players).filter(
-                p => p !== this.players[socketId] && p.distanceTo(this.players[socketId]) <= this.gameWidth / 2,
+                p => p !== this.players[socketId] && p.distanceTo(this.players[socketId]) <= (this.gameWidth+190) / 2,
             );
             const nearbyBullets = this.bullets.filter(
-                b => b.distanceTo(this.players[socketId]) <= this.gameWidth / 2,
+                b => b.distanceTo(this.players[socketId]) <= (this.gameWidth + 190) / 2,
             );
             let me = this.players[socketId].serializeMe();
             let otherPlayers = nearbyPlayers.filter(p => p.id !== socketId).map(p => p.serialize());
+            console.log(otherPlayers)
             let leaderBoard = Object.values(this.players).map(p => p.leaderBoardSerialize())
                 .sort((a, b) => {
                 if (a && b) {

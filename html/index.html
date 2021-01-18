@@ -38,7 +38,7 @@
         <form id="play-again-form">
             <p class="kills">100 kills </p>
             <label>Ghost Name </label>
-            <input class="name" id="name-play-again" type="text" placeholder="Guest" />
+            <input class="name" id="name-play-again" type="text" pattern="[A-Za-z].{,8}" maxlength="8" title="a-z and less than 8 characters." placeholder="Guest" />
             <div class="play-btn">
                 <button id="play" type="submit">Play Again</button>
             </div>

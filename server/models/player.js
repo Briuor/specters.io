@@ -13,8 +13,8 @@ class Player {
         this.angle = 0;
         this.score = 0;
         this.impulsed = false;
-        this.impulseSpeed = 0.1*80;
-        this.impulseVel = 20*80;
+        this.impulseSpeed = 0.1 * 80;
+        this.impulseVel = 20 * 80;
         this.hittedById = null;
         this.force = 320;
         this.shootCooldown = 600;
@@ -30,7 +30,7 @@ class Player {
     }
 
     serialize() {
-        return [this.id, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)),Number(this.angle.toFixed(2))];
+        return [this.id, this.name, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2))];
     }
 
     leaderBoardSerialize() {
@@ -38,7 +38,7 @@ class Player {
     }
 
     move(dt) {
-        const MAP_SIZE = 57*50;
+        const MAP_SIZE = 57 * 50;
         if (this.impulsed && this.impulseVel > 0) {
             this.impulseVel -= this.impulseSpeed;
             this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2) * dt;
@@ -54,8 +54,8 @@ class Player {
     }
 
     prepareImpulse() {
-        this.impulseSpeed = 0.1*80;
-        this.impulseVel = 20*80;
+        this.impulseSpeed = 0.1 * 80;
+        this.impulseVel = 20 * 80;
         this.impulsed = true;
     }
 
@@ -94,7 +94,7 @@ class Player {
 
     updateColor() {
         let newColor = 255 - this.score;
-        this.color = `rgb(${ newColor >= 0 ? newColor : 0}, 255, 255)`
+        this.color = `rgb(${newColor >= 0 ? newColor : 0}, 255, 255)`
     }
 
     updateDirection(code, value) {
@@ -108,11 +108,11 @@ class Player {
             this.direction.up = value;
     }
 
-     distanceTo(object) {
-    const dx = this.x - object.x;
-    const dy = this.y - object.y;
-    return Math.sqrt(dx * dx + dy * dy);
-  }
+    distanceTo(object) {
+        const dx = this.x - object.x;
+        const dy = this.y - object.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
 }
 
 module.exports = Player;

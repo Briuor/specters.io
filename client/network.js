@@ -17,6 +17,7 @@ module.exports = class Network {
     connect(state, loopRef, render) {
         this.connectPromise.then((socketId) => {
             render.meId = socketId;
+            render.playerName = localStorage.getItem('name');
             this.socket.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
             this.socket.on('disconnect', () => { clearInterval(loopRef) })
             this.socket.on('attack', (id) => {

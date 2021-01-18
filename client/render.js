@@ -1,12 +1,14 @@
+const PixelCanvas = require('./pixelCanvas');
 
 module.exports = class Render {
 
     constructor() {
-
+        this.pixelCanvas = new PixelCanvas();
         this.attackList = [];
         this.dieList = [];
         // me
         this.meId = '';
+        this.playerName = 'Unammed';
         this.playerImage = new Image();
         this.playerImage.src = './images/ghost2.png';
         this.currentFrame = 0;
@@ -91,7 +93,8 @@ module.exports = class Render {
         if (this.attackAnimation && this.currentFrame == totalFrames && totalFrames == 3) {
             this.attackAnimation = false;
         }
-        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col*26, this.meRay, 26, me.screenX-this.meRay, me.screenY-this.meRay, this.meRay*2, this.meRay*2);
+        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - this.meRay, me.screenY - this.meRay, this.meRay * 2, this.meRay * 2);
+        this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX + (this.meRay / 2) - (((this.playerName.length-1) * 2.4) *2), me.screenY);
     }
 
     drawPlayers(ctx, otherPlayers, bullets, camera) {
@@ -100,6 +103,7 @@ module.exports = class Render {
     }
 
     drawOther(ctx, p, camera, index) {
+
         // ctx.fillStyle = p.color;
         // ctx.beginPath();
         // ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
@@ -158,6 +162,7 @@ module.exports = class Render {
             this.oattackAnimation[index] = false;
         }
         ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - this.meRay - camera.x, p.y - this.meRay - camera.y, this.meRay * 2, this.meRay * 2);
+        this.pixelCanvas.drawName(ctx, p.name, 2.5, p.x - this.meRay - camera.x, p.y - this.meRay - camera.y);
     }
 
     drawBullet(ctx, p, camera) {

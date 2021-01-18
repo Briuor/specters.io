@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -14,7 +15,7 @@ const io = require('socket.io')(http, options);
 const Game = require('./game');
 
 const PORT = 3000;
-app.use('/', express.static('dist'));
+app.use('/', express.static(path.join(__dirname, '..', 'dist')));
 app.use(cors());
 
 http.listen(PORT, () => {
@@ -30,7 +31,7 @@ io.on('connection', socket => {
 
     socket.on('input', (input) => {
         game.handleInput(socket, input);
-        console.log(socket.id + ' pressed');
+        // console.log(socket.id + ' pressed');
     });
     
     socket.on('disconnect', () => {

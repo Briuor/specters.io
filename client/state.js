@@ -55,7 +55,7 @@ module.exports = class State {
         Object.keys(object1).forEach(key => {
             if (key == 'x' || key == 'y')
                 interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;
-            else if (key == 'angle' || key == 'id') {
+            else if (key == 'angle' || key == 'id' || key == 'name') {
                 interpolated[key] = object2[key];
             }
         });
@@ -68,9 +68,9 @@ module.exports = class State {
 
     deserialize(updateBuffer) {
         let me = this.deserializeMe(updateBuffer[0]);
-        // console.log(updateBuffer[1])
-        let otherPlayers = updateBuffer[1].map(buffer => this.deserializeGameObj(buffer));
-        let bullets = updateBuffer[2].map(buffer => this.deserializeGameObj(buffer));
+        let otherPlayers = updateBuffer[1].map(buffer => this.deserializeOthers(buffer));
+        console.log(otherPlayers);
+        let bullets = updateBuffer[2].map(buffer => this.deserializeBullet(buffer));
         let leaderBoard = updateBuffer[3].map(buffer => this.deserializeLeaderBoard(buffer));
         let t = updateBuffer[4];
         return { me, otherPlayers, bullets, leaderBoard, t };
@@ -81,7 +81,12 @@ module.exports = class State {
     }
 
 
-    deserializeGameObj(buffer) {
+    deserializeOthers(buffer) {
+        console.log(buffer);
+        return { id: buffer[0], name: buffer[1], x: buffer[2], y: buffer[3], angle: buffer[4] };
+    }
+
+    deserializeBullet(buffer) {
         return { id: buffer[0], x: buffer[1], y: buffer[2], angle: buffer[3] };
     }
 
