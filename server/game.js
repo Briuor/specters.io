@@ -27,6 +27,13 @@ class Game {
         delete this.players[socket.id];
     }
 
+
+    getNearbyPlayers(centerPlayer) {
+        return Object.values(this.players).filter(
+            p => p.distanceTo(centerPlayer) <= (this.gameWidth + 190) / 2,
+        )
+    }
+
     handleInput(socket, input, type) {
         if (this.players[socket.id]) {
             if (type == 'mousemove') {
@@ -36,9 +43,7 @@ class Game {
             else if (type == 'mouseclick') {
                 const bullet = this.players[socket.id].shoot(socket.id);
                 if (bullet) {
-                    Object.values(this.players).filter(
-                        p => p.distanceTo(this.players[socket.id]) <= (this.gameWidth + 190) / 2,
-                    ).map(p => this.sockets[p.id].emit('attack', p.id));
+                    this.getNearbyPlayers(this.players[socket.id]).map(p => this.sockets[p.id].emit('attack', p.id));
 
                     this.bullets.push(bullet);
                 }
