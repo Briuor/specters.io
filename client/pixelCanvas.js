@@ -217,10 +217,10 @@ module.exports = class pixelCanvas {
             }
         }
         ctx.fillStyle = '#fff';
-        var currX = cx-18;
+        var currX = cx;
         for (i = 0; i < needed.length; i++) {
             letter = needed[i];
-            var currY = cy-45;
+            var currY = cy;
             var addX = 0;
             for (var y = 0; y < letter.length; y++) {
                 var row = letter[y];

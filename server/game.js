@@ -1,7 +1,6 @@
 const Player = require('./models/player');
 const Map = require('../shared/map');
 const CollisionHandler = require('./physics/collisionHandler');
-const msgpack = require("msgpack-lite");
 
 class Game {
     constructor(io) {
@@ -28,21 +27,24 @@ class Game {
         delete this.players[socket.id];
     }
 
-    handleInput(socket, input) {
+    handleInput(socket, input, type) {
         if (this.players[socket.id]) {
-            if (input.type == 'mousemove') {
-                this.players[socket.id].updateAngle(input);
+            if (type == 'mousemove') {
+                console.log(input)
+                this.players[socket.id].updateAngle({ distX: input[0], distY: input[1]});
             }
-            else if (input.type == 'mouseclick') {
+            else if (type == 'mouseclick') {
                 const bullet = this.players[socket.id].shoot(socket.id);
                 if (bullet) {
-                    this.io.sockets.emit('attack', socket.id);
+                    Object.values(this.players).filter(
+                        p => p.distanceTo(this.players[socket.id]) <= (this.gameWidth + 190) / 2,
+                    ).map(p => this.sockets[p.id].emit('attack', p.id));
+
                     this.bullets.push(bullet);
                 }
             }
-            else if (input.type == 'keyboard') {
-                let { keyCode, value } = input;
-                this.players[socket.id].updateDirection(keyCode, value);
+            else if (type == 'keyboard') {
+                this.players[socket.id].updateDirection({ keyCode:input[0], value: input[1] });
             }
         }
     }
@@ -63,9 +65,8 @@ class Game {
                     if (this.sockets[playerId]) {
                         let playerScoreId = this.players[playerId].hittedById;
                         // if was hitted
-                        if (playerScoreId && this.players[playerScoreId]) {
-                            this.players[playerScoreId].increaseScore(1);
-                            this.players[playerScoreId].updateColor();
+                        if (playerScoreId && this.players[playerScoreId] && this.players[playerId].impulsed) {
+                            this.players[playerScoreId].updateStatus();
                         }
                         // DIE
                         this.io.sockets.emit('die', playerId);
@@ -108,16 +109,14 @@ class Game {
             );
             let me = this.players[socketId].serializeMe();
             let otherPlayers = nearbyPlayers.filter(p => p.id !== socketId).map(p => p.serialize());
-            console.log(otherPlayers)
             let leaderBoard = Object.values(this.players).map(p => p.leaderBoardSerialize())
                 .sort((a, b) => {
                 if (a && b) {
-                    return a.score - b.score;
+                    return a.kills - b.kills;
                 }
             }).splice(0, 10);
             let bullets = nearbyBullets.map(b => b.serialize());
             let msg = [me, otherPlayers, bullets, leaderBoard, Date.now()];
-            // msg = { t: Date.now(), me, otherPlayers, bullets, leaderBoard };
             this.sockets[socketId].emit('update', msg);
         });
     }

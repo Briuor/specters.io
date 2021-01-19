@@ -60,7 +60,7 @@ input.name {
   border: none;
 }
 
-div.leaderboard-wrapper {
+div#leaderboard-wrapper {
   position: absolute;
   right: 20px;
   top: 0;
@@ -70,10 +70,12 @@ div.leaderboard-wrapper {
   -ms-user-select:none;
   user-select:none;
   -o-user-select:none;
+  font-size: 0.9em;
+  display: none;
 }
 
 ul#leaderboard {
-  width: 200px;
+  width: 150px;
   -moz-user-select: none; 
   -webkit-user-select: none;
   -ms-user-select:none;
@@ -82,7 +84,8 @@ ul#leaderboard {
   margin: 0;
   padding: 0;
   list-style-type: none;
-  font-size: 1em;
+  font-size: 0.9em;
+
 }
 
 li {
@@ -108,7 +111,7 @@ div#play-again-modal input{
   border: 3px solid #000;
 }
 
-div#play-again-modal p.kills{
+div#play-again-modal p#kills{
   text-align: center;
   color: #ff0000;
   font-size: 1.3em;

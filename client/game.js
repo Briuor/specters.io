@@ -4,25 +4,28 @@ const State = require('./state');
 const Render = require('./render');
 const Input = require('./input');
 const Network = require('./network');
-const { Howl, Howler } = require('howler');
-
+const { Howl } = require('howler');
+const { validateName } = require('./util/validations');
 
 module.exports = class Game {
     constructor() {
+        this.leaderBoardWrapper = document.getElementById('leaderboard-wrapper');
         this.leaderBoard = document.getElementById('leaderboard');
         this.playAgainModal = document.getElementById('play-again-modal');
         this.playAgainForm = document.getElementById('play-again-form');
         this.namePlayAgainTextField = document.getElementById('name-play-again');
+        this.killsElement = document.getElementById('kills');
         
         this.playAgainForm.addEventListener("submit", (e) => {
             e.preventDefault();
             this.playAgainModal.style.display = 'none';
             this.init();
-            window.localStorage.setItem('name', this.namePlayAgainTextField.value);
-            this.start(this.namePlayAgainTextField.value);
+            this.start(validateName(this.namePlayAgainTextField.value));
         })
         this.canvas = document.getElementById('canvas');
         this.canvas.style.background = "black";
+
+        this.kills = 0;
 
         this.ctx = this.canvas.getContext('2d');
         this.gameWidth = 1280;
@@ -30,11 +33,8 @@ module.exports = class Game {
         this.cwidth = window.innerWidth - 4;
         this.cheight = window.innerHeight - 4;
 
-
         this.resizeCanvas.bind(this);
         window.addEventListener("resize", () => { this.resizeCanvas(); });
-
-        
 
         this.init();
     }
@@ -52,25 +52,13 @@ module.exports = class Game {
             src: ['./sounds/lava.mp3'],
             volume: 0.3,
             loop: true,
-            onend: function () {
-                console.log('Finished!');
-            }
         });
         this.windSound = new Howl({
             src: ['./sounds/wind.ogg'],
             volume: 0.1,
             loop: true,
-            onend: function () {
-                console.log('Finished!');
-            }
         });
-        this.dieSound = new Howl({
-            src: ['./sounds/die.mp3'],
-            volume: 0.5,
-            onend: function () {
-                console.log('Finished!');
-            }
-        });
+
         this.map = new Map();
         this.camera = new Camera(this.gameWidth, this.gameHeight, this.map);
         this.state = new State();
@@ -80,7 +68,6 @@ module.exports = class Game {
         this.loopRef = null;
         this.gameOver = this.gameOver.bind(this);
         
-
         this.resizeCanvas();
     }
 
@@ -105,7 +92,7 @@ module.exports = class Game {
         this.ctx.webkitImageSmoothingEnabled = false;
         this.ctx.msImageSmoothingEnabled = false;
         this.ctx.imageSmoothingEnabled = false;
-        
+        this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
     }
 
     removeChilds(node) {
@@ -116,8 +103,8 @@ module.exports = class Game {
     updateLeaderBoard(leaderBoard) {
         let isTop10 = false;
         this.removeChilds(this.leaderBoard);
-        let len = leaderBoard.length;
-        for (let i = 0; i < (len < 10 ? len: 10); i++) {
+        let len = leaderBoard.length -1;
+        for (let i = (len <= 9 ? len : 9); i >= 0; i--) {
             let player = leaderBoard[i];
             let li = document.createElement('li');
             let spanName = document.createElement('span');
@@ -133,6 +120,7 @@ module.exports = class Game {
             li.appendChild(spanName);
             li.appendChild(spanScore);
             this.leaderBoard.appendChild(li);
+            this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
         }
         // if (!isTop10) {
         //     textnode = document.createTextNode(i + player.name + ' ' + player.score);
@@ -144,6 +132,7 @@ module.exports = class Game {
         this.network.socket.disconnect();
         clearInterval(this.loopRef);
         this.playAgainModal.style.display = "block";
+        this.killsElement.innerText = this.kills + " Kills";
         this.namePlayAgainTextField.value = localStorage.getItem('name') ? localStorage.getItem('name') : 'unnamed';
     }
 
@@ -153,6 +142,8 @@ module.exports = class Game {
         const { me, otherPlayers, bullets, leaderBoard } = this.state.getCurrentState();
 
         if (!me) return;
+        this.kills = me.kills;
+
         this.camera.follow(me);
         this.camera.update();
         this.camera.following.scX = this.cwidth / 2;
@@ -177,6 +168,8 @@ module.exports = class Game {
             this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
             this.lavaSound.play();
             this.windSound.play();
+            this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
+            this.leaderBoardWrapper.style.display = 'block';
         });
     }
 }

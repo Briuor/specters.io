@@ -3,13 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const http = require('http').createServer(app);
-const customParser = require('socket.io-msgpack-parser');
+// const customParser = require('socket.io-msgpack-parser');
 
 const options = {
     cors: true,
     origins: ["http://127.0.0.1:80", "http://127.0.0.1:3000"],
     transport: ['websocket'],
-    parser: customParser
+    // parser: customParser
 }
 const io = require('socket.io')(http, options);
 const Game = require('./game');
@@ -29,8 +29,18 @@ io.on('connection', socket => {
         console.log(socket.id + ' connected');
     });
 
-    socket.on('input', (input) => {
-        game.handleInput(socket, input);
+    socket.on('imc', () => {
+        game.handleInput(socket, null, 'mouseclick');
+        // console.log(socket.id + ' pressed');
+    });
+
+    socket.on('imm', (input) => {
+        game.handleInput(socket, input, 'mousemove');
+        // console.log(socket.id + ' pressed');
+    });
+
+    socket.on('ik', (input) => {
+        game.handleInput(socket, input, 'keyboard');
         // console.log(socket.id + ' pressed');
     });
     

@@ -1,10 +1,11 @@
 const Game = require('./game');
+const {validateName} = require('./util/validations');
 
 window.onload = () => {
     const game = new Game();
     const playForm = document.getElementById('play-form');
     const body = document.getElementsByTagName('body')[0];
-    const name = document.getElementById('name-play');    
+    const name = document.getElementById('name-play');
     const gameName = document.getElementsByClassName('game-name')[0];
     name.focus();
     playForm.addEventListener('submit', (e) => {
@@ -17,11 +18,3 @@ window.onload = () => {
     });
 }
 
-function validateName(name) {
-    let nameNoSpace = name.trim();
-    console.log(nameNoSpace)
-    nameNoSpace = nameNoSpace === "" ? 'Unammed' : nameNoSpace;
-    localStorage.removeItem('name');
-    localStorage.setItem('name', nameNoSpace);
-    return nameNoSpace;
-}

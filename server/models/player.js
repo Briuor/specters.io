@@ -11,12 +11,11 @@ class Player {
         this.speed = 180;
         this.color = '#fff';
         this.angle = 0;
-        this.score = 0;
+        this.kills = 0;
         this.impulsed = false;
-        this.impulseSpeed = 0.1 * 80;
+        this.impulseSpeed = 8;
         this.impulseVel = 20 * 80;
         this.hittedById = null;
-        this.force = 320;
         this.shootCooldown = 600;
         this.shootTime = 0;
         this.shot = false;
@@ -26,7 +25,7 @@ class Player {
         this.dieTime = 0;
     }
     serializeMe() {
-        return [Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2))];
+        return [Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2)), this.kills];
     }
 
     serialize() {
@@ -34,16 +33,18 @@ class Player {
     }
 
     leaderBoardSerialize() {
-        return [this.name, this.score];
+        return [this.name, this.kills];
     }
 
     move(dt) {
         const MAP_SIZE = 57 * 50;
-        if (this.impulsed && this.impulseVel > 0) {
+        if (this.impulseVel > 0 && this.impulsed) {
             this.impulseVel -= this.impulseSpeed;
             this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2) * dt;
             this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2) * dt;
             this.impulseVel *= 0.9;
+        } else {
+            this.impulsed = false;
         }
         if (this.direction.right) this.x += this.speed * dt;
         if (this.direction.left) this.x -= this.speed * dt;
@@ -64,10 +65,6 @@ class Player {
         this.prepareImpulse();
     }
 
-    increaseScore(value) {
-        this.score += value;
-    }
-
     shoot(ownerId) {
         if (Date.now() - this.shootCooldown >= this.shootTime) {
             this.shootTime = Date.now();
@@ -85,26 +82,25 @@ class Player {
     }
 
 
-    updateAngle(input) {
-        let centerX = input.screen.x;
-        let centerY = input.screen.y;
-
-        this.angle = Math.atan2(input.y - centerY, input.x - centerX) + Math.PI / 2;
+    updateAngle({ distX, distY }) {
+        this.angle = Math.atan2(distY, distX) + Math.PI / 2;
     }
 
-    updateColor() {
-        let newColor = 255 - this.score;
-        this.color = `rgb(${newColor >= 0 ? newColor : 0}, 255, 255)`
+    updateStatus() {
+        this.kills++;
+        this.impulseSpeed += this.impulseSpeed <= 20 ? 1 : 0;
+        this.speed += this.speed <= 300 ? 10 : 0;
+        this.color += this.color < 10 ? 1: 0;
     }
 
-    updateDirection(code, value) {
-        if (code == 68 || code == 39)
+    updateDirection({ keyCode, value }) {
+        if (keyCode == 68 || keyCode == 39)
             this.direction.right = value;
-        else if (code == 83 || code == 40)
+        else if (keyCode == 83 || keyCode == 40)
             this.direction.down = value;
-        else if (code == 65 || code == 37)
+        else if (keyCode == 65 || keyCode == 37)
             this.direction.left = value;
-        else if (code == 87 || code == 38)
+        else if (keyCode == 87 || keyCode == 38)
             this.direction.up = value;
     }
 

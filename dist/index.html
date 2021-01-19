@@ -13,7 +13,7 @@
 
 <body>
     <canvas id="canvas"></canvas>
-    <div class="leaderboard-wrapper">
+    <div id="leaderboard-wrapper">
         Ranking
         <ul id="leaderboard">
             
@@ -23,8 +23,8 @@
         <img src="/images/gamename.png" />
     </div>
     <form id="play-form">
-        <label>Ghost Name </label>
-        <input class="name" id="name-play" type="text" placeholder="Guest" />
+        <label>Ghost Name</label>
+        <input class="name" id="name-play" type="text" placeholder="Unammed" />
         <div class="play-btn">
             <button id="play" type="submit">Play</button>
         </div>
@@ -36,9 +36,9 @@
             <img src="/images/gamename.png" />
         </div>
         <form id="play-again-form">
-            <p class="kills">100 kills </p>
+            <p id="kills"></p>
             <label>Ghost Name </label>
-            <input class="name" id="name-play-again" type="text" pattern="[A-Za-z].{,8}" maxlength="8" title="a-z and less than 8 characters." placeholder="Guest" />
+            <input class="name" id="name-play-again" type="text" pattern="[A-Za-z].{,8}" max="8" title="a-z and less than 8 characters." placeholder="Guest" />
             <div class="play-btn">
                 <button id="play" type="submit">Play Again</button>
             </div>

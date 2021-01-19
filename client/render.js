@@ -95,7 +95,8 @@ module.exports = class Render {
             this.attackAnimation = false;
         }
         ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - this.meRay, me.screenY - this.meRay, this.meRay * 2, this.meRay * 2);
-        this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX + (this.meRay / 2) - (((this.playerName.length-1) * 2.4) *2), me.screenY);
+
+        this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX - ((this.playerName.length) * 2.4 * 2) , me.screenY - this.meRay- 20);
     }
 
     drawPlayers(ctx, otherPlayers, bullets, camera, attackSound, dieSound) {
@@ -165,7 +166,7 @@ module.exports = class Render {
             this.oattackAnimation[index] = false;
         }
         ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - this.meRay - camera.x, p.y - this.meRay - camera.y, this.meRay * 2, this.meRay * 2);
-        this.pixelCanvas.drawName(ctx, p.name, 2.5, p.x - this.meRay - camera.x, p.y - this.meRay - camera.y);
+        this.pixelCanvas.drawName(ctx, p.name, 2.5, p.x - camera.x - ((p.name.length) * 2.4 * 2), p.y - this.meRay - camera.y-20);
     }
 
     drawBullet(ctx, p, camera) {

@@ -1,9 +1,8 @@
 const ioc = require('socket.io-client');
-const customParser = require('socket.io-msgpack-parser');
 module.exports = class Network {
     start(name) {
         this.name = name;
-        this.socket = ioc('ws://localhost:3000', {parser: customParser});
+        this.socket = ioc('ws://localhost:3000');
         
 
         this.connectPromise = new Promise(resolve => {
