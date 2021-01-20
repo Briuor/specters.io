@@ -13,12 +13,16 @@ module.exports = class Network {
         })
     }
 
-    connect(state, loopRef, render) {
+    connect(state, loopRef, render, updateLeaderBoard, gameCtx) {
         this.connectPromise.then((socketId) => {
             render.meId = socketId;
             render.playerName = localStorage.getItem('name');
             this.socket.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
             this.socket.on('disconnect', () => { clearInterval(loopRef) })
+            this.socket.on('leaderboard', (leaderboard) => {
+                let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
+                updateLeaderBoard(deserialized, gameCtx);
+            })
             this.socket.on('attack', (id) => {
                 render.attackList.push(id);
             })
@@ -27,4 +31,9 @@ module.exports = class Network {
             })
         })
     }
+
+    deserializeLeaderBoard(buffer) {
+        return { id: buffer[0], name: buffer[1], score: buffer[2] };
+    }
+
 }

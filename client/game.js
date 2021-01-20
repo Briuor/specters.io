@@ -100,15 +100,22 @@ module.exports = class Game {
         while (last = node.lastChild) node.removeChild(last);
     }
 
-    updateLeaderBoard(leaderBoard) {
+    updateLeaderBoard(leaderBoard, context) {
         let isTop10 = false;
-        this.removeChilds(this.leaderBoard);
-        let len = leaderBoard.length -1;
-        for (let i = (len <= 9 ? len : 9); i >= 0; i--) {
+        context.removeChilds(context.leaderBoard);
+        let len = leaderBoard.length - 1;
+        console.log(len)
+        for (let i = (len < 3 ? len : 2), rankPos = 1; i >= 0; i--, rankPos++) {
             let player = leaderBoard[i];
             let li = document.createElement('li');
             let spanName = document.createElement('span');
-            let textnode = document.createTextNode(player.name);
+            let highlight = '';
+            if (player.id == context.render.meId) {
+                isTop10 = true;
+                highlight = '>';
+                spanName.style.marginLeft -= 13;
+            }
+            let textnode = document.createTextNode(highlight + ' ' + (rankPos) + '. ' +player.name);
             spanName.appendChild(textnode);
 
             let spanScore = document.createElement('span');
@@ -119,13 +126,26 @@ module.exports = class Game {
 
             li.appendChild(spanName);
             li.appendChild(spanScore);
-            this.leaderBoard.appendChild(li);
-            this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
+            context.leaderBoard.appendChild(li);
         }
-        // if (!isTop10) {
-        //     textnode = document.createTextNode(i + player.name + ' ' + player.score);
-        //     this.leaderBoard.appendChild(textnode);
-        // }
+        if (!isTop10) {
+            let li = document.createElement('li');
+            let spanName = document.createElement('span');
+            textnode = document.createTextNode('> ?. ' + localStorage.getItem('name'));
+            spanName.appendChild(textnode);
+            let spanScore = document.createElement('span');
+            spanScore.className = 'leaderboard-score';
+            textnode = document.createTextNode(context.kills);
+            spanScore.appendChild(textnode);
+
+
+            li.appendChild(spanName);
+            li.appendChild(spanScore);
+            context.leaderBoard.appendChild(li);
+
+        }
+        context.leaderBoardWrapper.style.marginRight = context.canvas.getBoundingClientRect().left;
+
     }
 
     gameOver() {
@@ -139,7 +159,7 @@ module.exports = class Game {
     // Main Loop
     run() {
         // get update
-        const { me, otherPlayers, bullets, leaderBoard } = this.state.getCurrentState();
+        const { me, otherPlayers, bullets } = this.state.getCurrentState();
 
         if (!me) return;
         this.kills = me.kills;
@@ -156,7 +176,6 @@ module.exports = class Game {
         this.camera.draw(this.ctx, this.map);
         this.render.drawPlayer(this.ctx, me, this.gameOver, this.attackSound, this.dieSound);
         this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
-        this.updateLeaderBoard(leaderBoard);
     }
 
     start(playerName) {
@@ -164,7 +183,7 @@ module.exports = class Game {
         this.network.start(playerName);
 
         this.input.listen(this.network, this.camera, this.canvas);
-        Promise.all([this.network.connect(this.state, this.loopRef, this.render, this.meId)]).then(() => {
+        Promise.all([this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this)]).then(() => {
             this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
             this.lavaSound.play();
             this.windSound.play();

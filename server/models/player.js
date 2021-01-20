@@ -33,7 +33,7 @@ class Player {
     }
 
     leaderBoardSerialize() {
-        return [this.name, this.kills];
+        return [this.id, this.name, this.kills];
     }
 
     move(dt) {

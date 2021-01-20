@@ -70,9 +70,9 @@ module.exports = class State {
         let me = this.deserializeMe(updateBuffer[0]);
         let otherPlayers = updateBuffer[1].map(buffer => this.deserializeOthers(buffer));
         let bullets = updateBuffer[2].map(buffer => this.deserializeBullet(buffer));
-        let leaderBoard = updateBuffer[3].map(buffer => this.deserializeLeaderBoard(buffer));
-        let t = updateBuffer[4];
-        return { me, otherPlayers, bullets, leaderBoard, t };
+        // let leaderBoard = updateBuffer[3].map(buffer => this.deserializeLeaderBoard(buffer));
+        let t = updateBuffer[3];
+        return { me, otherPlayers, bullets, t };
     }
 
     deserializeMe(buffer) {

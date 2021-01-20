@@ -94,8 +94,8 @@ module.exports = class Render {
         if (this.attackAnimation && this.currentFrame == totalFrames && totalFrames == 3) {
             this.attackAnimation = false;
         }
+        
         ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - this.meRay, me.screenY - this.meRay, this.meRay * 2, this.meRay * 2);
-
         this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX - ((this.playerName.length) * 2.4 * 2) , me.screenY - this.meRay- 20);
     }
 
