@@ -11,9 +11,10 @@ module.exports = class Map {
         return this.tiles[row * this.cols + col];
     }
 
-    isPositionLava(player) {
+    isPositionLava(player, kills) {
+        let sizeIncrease = kills * 4;
         var tileX = Math.floor(player.x / this.tsize);
-        var tileY = Math.floor((player.y + 20) / this.tsize);
+        var tileY = Math.floor((player.y + 20 + sizeIncrease/2) / this.tsize);
 
         return this.tiles[tileY * this.cols + tileX] == 11;
     }

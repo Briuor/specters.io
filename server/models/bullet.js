@@ -1,10 +1,10 @@
 const { nanoid } = require('nanoid');
 
 class Bullet {
-    constructor(x, y, r, angle, ownerId) {
+    constructor(x, y, r, angle, ownerId, meRay) {
         this.id = nanoid();
-        this.x = x + 2 * r * Math.cos(angle - Math.PI / 2);
-        this.y = y + 2 * r * Math.sin(angle - Math.PI / 2);
+        this.x = x + (meRay/2) * Math.cos(angle - Math.PI / 2);
+        this.y = y + (meRay/2) * Math.sin(angle - Math.PI / 2);
         this.r = r;
         this.speed = 600;
         this.angle = angle;

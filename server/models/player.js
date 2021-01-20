@@ -5,13 +5,13 @@ class Player {
         this.id = id;
         this.x = x;
         this.y = y;
+        this.kills = 0;
         this.r = 28;
         this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
         this.speed = 180;
         this.color = '#fff';
         this.angle = 0;
-        this.kills = 0;
         this.impulsed = false;
         this.impulseSpeed = 8;
         this.impulseVel = 20 * 80;
@@ -29,7 +29,7 @@ class Player {
     }
 
     serialize() {
-        return [this.id, this.name, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2))];
+        return [this.id, this.name, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2)), this.kills];
     }
 
     leaderBoardSerialize() {
@@ -69,7 +69,7 @@ class Player {
         if (Date.now() - this.shootCooldown >= this.shootTime) {
             this.shootTime = Date.now();
             this.shot = true;
-            return new Bullet(this.x, this.y, 10, this.angle, ownerId);
+            return new Bullet(this.x, this.y, 10, this.angle, ownerId, this.r);
         }
         return false;
     }
@@ -88,9 +88,9 @@ class Player {
 
     updateStatus() {
         this.kills++;
+        this.r = 28 + this.kills * 4; // 28 initial ray
         this.impulseSpeed += this.impulseSpeed <= 20 ? 1 : 0;
         this.speed += this.speed <= 300 ? 10 : 0;
-        this.color += this.color < 10 ? 1: 0;
     }
 
     updateDirection({ keyCode, value }) {

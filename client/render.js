@@ -34,15 +34,14 @@ module.exports = class Render {
         this.animationProjectileTime = Date.now();
         this.animationProjectileDuration = 400;
         this.bulletRay = 10;
-
-
     }
 
-    drawPlayer(ctx, me, gameOver, attackSound, dieSound) {
-        // ctx.fillStyle = me.color;
-        // ctx.beginPath();
-        // ctx.arc(me.screenX, me.screenY, me.r, 0, 2 * Math.PI);
-        // ctx.fill();
+    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills) {
+        let sizeIncrease = kills * 4;
+        ctx.fillStyle = 'yellow';
+        ctx.beginPath();
+        ctx.arc(me.screenX, me.screenY, this.meRay + sizeIncrease/2, 0, 2 * Math.PI);
+        ctx.fill();
 
         let col;
         let angle = (180 * me.angle) / Math.PI; 
@@ -95,8 +94,12 @@ module.exports = class Render {
             this.attackAnimation = false;
         }
         
-        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - this.meRay, me.screenY - this.meRay, this.meRay * 2, this.meRay * 2);
-        this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX - ((this.playerName.length) * 2.4 * 2) , me.screenY - this.meRay- 20);
+        let playerSizeIncrease = sizeIncrease / 2 + this.meRay;
+        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - playerSizeIncrease, me.screenY - playerSizeIncrease, (this.meRay * 2) + sizeIncrease, (this.meRay * 2) + sizeIncrease);
+        this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX - ((this.playerName.length) * 2.4 * 2), me.screenY - playerSizeIncrease - 20);
+        // ctx.fillStyle = 'red';
+        // ctx.fillRect(me.screenX - (sizeIncrease / 2 + this.meRay), me.screenY - (this.meRay + sizeIncrease / 2), 10, 10);
+
     }
 
     drawPlayers(ctx, otherPlayers, bullets, camera, attackSound, dieSound) {
@@ -105,6 +108,7 @@ module.exports = class Render {
     }
 
     drawOther(ctx, p, camera, index, attackSound, dieSound) {
+        let sizeIncrease = p.kills * 4;
 
         // ctx.fillStyle = p.color;
         // ctx.beginPath();
@@ -118,10 +122,8 @@ module.exports = class Render {
             this.ocurrentFrame[index] = 0;
         }
 
-
         let angle = (180 * p.angle) / Math.PI;
         if (angle < 0) angle = 360 + angle;
-
 
         if (this.attackList.length > 0 && this.attackList.includes(p.id)) {
             this.ocurrentFrame[index] = 0;
@@ -165,7 +167,8 @@ module.exports = class Render {
         if (this.oattackAnimation[index] && this.ocurrentFrame[index] == 3 && totalFrames == 3) {
             this.oattackAnimation[index] = false;
         }
-        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - this.meRay - camera.x, p.y - this.meRay - camera.y, this.meRay * 2, this.meRay * 2);
+        let playerSizeIncrease = sizeIncrease / 2 + this.meRay;
+        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay * 2 + sizeIncrease, this.meRay * 2 + sizeIncrease);
         this.pixelCanvas.drawName(ctx, p.name, 2.5, p.x - camera.x - ((p.name.length) * 2.4 * 2), p.y - this.meRay - camera.y-20);
     }
 

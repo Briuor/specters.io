@@ -81,7 +81,7 @@ module.exports = class State {
 
 
     deserializeOthers(buffer) {
-        return { id: buffer[0], name: buffer[1], x: buffer[2], y: buffer[3], angle: buffer[4] };
+        return { id: buffer[0], name: buffer[1], x: buffer[2], y: buffer[3], angle: buffer[4], kills: buffer[5] };
     }
 
     deserializeBullet(buffer) {

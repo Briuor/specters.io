@@ -68,7 +68,7 @@ class Game {
             else if (this.players[playerId] && !this.players[playerId].die) {
                 this.players[playerId].move(dt);
                 // check if died
-                if (this.map.isPositionLava(this.players[playerId])) {
+                if (this.map.isPositionLava(this.players[playerId], this.players[playerId].kills)) {
                     if (this.sockets[playerId]) {
                         let playerScoreId = this.players[playerId].hittedById;
                         // if was hitted

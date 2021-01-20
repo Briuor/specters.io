@@ -46,7 +46,7 @@ module.exports = class Game {
         });
         this.dieSound = new Howl({
             src: ['./sounds/die.mp3'],
-            volume: 1,
+            volume: 0.4,
         });
         this.lavaSound = new Howl({
             src: ['./sounds/lava.mp3'],
@@ -175,7 +175,7 @@ module.exports = class Game {
 
         // draw
         this.camera.draw(this.ctx, this.map);
-        this.render.drawPlayer(this.ctx, me, this.gameOver, this.attackSound, this.dieSound);
+        this.render.drawPlayer(this.ctx, me, this.gameOver, this.attackSound, this.dieSound, this.kills);
         this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
     }
 
