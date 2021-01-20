@@ -105,7 +105,7 @@ module.exports = class Game {
         context.removeChilds(context.leaderBoard);
         let len = leaderBoard.length - 1;
         console.log(len)
-        for (let i = (len < 3 ? len : 2), rankPos = 1; i >= 0; i--, rankPos++) {
+        for (let i = (len < 5 ? len : 4), rankPos = 1; i >= 0; i--, rankPos++) {
             let player = leaderBoard[i];
             let li = document.createElement('li');
             let spanName = document.createElement('span');
@@ -131,6 +131,7 @@ module.exports = class Game {
         if (!isTop10) {
             let li = document.createElement('li');
             let spanName = document.createElement('span');
+            spanName.style.marginLeft -= 13;
             textnode = document.createTextNode('> ?. ' + localStorage.getItem('name'));
             spanName.appendChild(textnode);
             let spanScore = document.createElement('span');
