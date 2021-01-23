@@ -21,8 +21,6 @@ class Animator {
 
             this.frame_index = (this.frame_index == this.frame_set.length - 1) ? 0 : this.frame_index + 1;
             this.frame_value = this.frame_set[this.frame_index];
-
-
         }
 
     }
@@ -43,7 +41,7 @@ module.exports = class Camera {
         this.tileSetImage.src = './images/tileset.png';
         this.animations = {
             38: new Animator([38, 39, 40, 41, 42, 60], 15),
-            55: new Animator([55, 56, 57, 58, 59, 60], 15),
+            55: new Animator([57, 58, 59, 60, 55, 56], 15),
         };
 
     }
@@ -62,24 +60,6 @@ module.exports = class Camera {
         // camera follow the player
         this.x = this.following.x - this.w / 2;
         this.y = this.following.y - this.h / 2;
-        // console.log(this.following.x, this.following.y)
-
-        // Fixa os valores
-        // this.x = Math.max(0, Math.min(this.x, this.maxX));
-        // this.y = Math.max(-12*57, Math.min(this.y, this.maxY));
-
-        // left right limits
-        // if (this.following.x < this.w / 2 ||
-        //     this.following.x > this.maxX + this.w / 2) {
-        //     this.following.screenX = this.following.x - this.x;
-        // }
-
-        // // top bottom limits
-        // if (this.following.y < this.h / 2 ||
-        //     this.following.y > this.maxY + this.h / 2) {
-        //     this.following.screenY = this.following.y - this.y;
-        // }
-
     }
 
     draw(ctx, map) {

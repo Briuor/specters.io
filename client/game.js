@@ -15,7 +15,7 @@ module.exports = class Game {
         this.playAgainForm = document.getElementById('play-again-form');
         this.namePlayAgainTextField = document.getElementById('name-play-again');
         this.killsElement = document.getElementById('kills');
-        
+
         this.playAgainForm.addEventListener("submit", (e) => {
             e.preventDefault();
             this.playAgainModal.style.display = 'none';
@@ -159,6 +159,7 @@ module.exports = class Game {
 
     // Main Loop
     run() {
+        // requestAnimationFrame(this.run.bind(this))
         // get update
         const { me, otherPlayers, bullets } = this.state.getCurrentState();
 
@@ -185,6 +186,8 @@ module.exports = class Game {
 
         this.input.listen(this.network, this.camera, this.canvas);
         Promise.all([this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this)]).then(() => {
+            
+            // requestAnimationFrame(this.run.bind(this))
             this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
             this.lavaSound.play();
             this.windSound.play();

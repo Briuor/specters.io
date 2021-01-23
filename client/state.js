@@ -31,7 +31,6 @@ module.exports = class State {
         const base = this.getBaseUpdate();
         const serverTime = this.currentServerTime();
 
-        console.log(this.updates)
         if (base < 0 || base === this.updates.length - 1) {
             return this.updates[this.updates.length - 1];
         } else {
@@ -56,9 +55,8 @@ module.exports = class State {
         Object.keys(object1).forEach(key => {
             if (key == 'x' || key == 'y')
                 interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;
-            else if (key == 'angle' || key == 'id' || key == 'name' || key == 'kills') {
+            else
                 interpolated[key] = object2[key];
-            }
         });
         return interpolated;
     }
@@ -71,7 +69,6 @@ module.exports = class State {
         let me = this.deserializeMe(updateBuffer[0]);
         let otherPlayers = updateBuffer[1].map(buffer => this.deserializeOthers(buffer));
         let bullets = updateBuffer[2].map(buffer => this.deserializeBullet(buffer));
-        // let leaderBoard = updateBuffer[3].map(buffer => this.deserializeLeaderBoard(buffer));
         let t = updateBuffer[3];
         return { me, otherPlayers, bullets, t };
     }

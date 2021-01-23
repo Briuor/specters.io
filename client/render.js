@@ -10,7 +10,7 @@ module.exports = class Render {
         this.meId = '';
         this.playerName = 'Unammed';
         this.playerImage = new Image();
-        this.playerImage.src = './images/ghost2.png';
+        this.playerImage.src = './images/ghost.png';
         this.currentFrame = 0;
         this.animationTime = Date.now();
         this.animationDuration = 100;
@@ -29,10 +29,7 @@ module.exports = class Render {
 
         // projectile
         this.projectileImage = new Image();
-        this.projectileImage.src = './images/projectile2.png';
-        this.currentProjectileFrame = 0;
-        this.animationProjectileTime = Date.now();
-        this.animationProjectileDuration = 500;
+        this.projectileImage.src = './images/projectile.png';
         this.bulletRay = 10;
     }
 
@@ -180,11 +177,7 @@ module.exports = class Render {
         ctx.translate(p.x - camera.x, p.y - camera.y);
         ctx.rotate(Math.PI + p.angle);
         ctx.translate(-(p.x - camera.x), -(p.y - camera.y));
-        if (Date.now() - this.animationProjectileDuration >= this.animationProjectileTime) {
-            this.currentProjectileFrame = this.currentProjectileFrame >= 3 ? 0 : this.currentProjectileFrame + 1;
-            this.animationProjectileTime = Date.now();
-        }
-        ctx.drawImage(this.projectileImage, this.currentProjectileFrame * this.bulletRay, 0, this.bulletRay, this.bulletRay, p.x - this.bulletRay - camera.x, p.y - this.bulletRay - camera.y, this.bulletRay*2, this.bulletRay*2);
+        ctx.drawImage(this.projectileImage, 0, 0, this.bulletRay, this.bulletRay, p.x - this.bulletRay - camera.x, p.y - this.bulletRay - camera.y, this.bulletRay*2, this.bulletRay*2);
         ctx.restore();
     }
 }
