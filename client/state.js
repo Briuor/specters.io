@@ -31,6 +31,7 @@ module.exports = class State {
         const base = this.getBaseUpdate();
         const serverTime = this.currentServerTime();
 
+        console.log(this.updates)
         if (base < 0 || base === this.updates.length - 1) {
             return this.updates[this.updates.length - 1];
         } else {

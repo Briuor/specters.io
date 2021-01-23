@@ -29,19 +29,19 @@ module.exports = class Render {
 
         // projectile
         this.projectileImage = new Image();
-        this.projectileImage.src = './images/projectile.png';
+        this.projectileImage.src = './images/projectile2.png';
         this.currentProjectileFrame = 0;
         this.animationProjectileTime = Date.now();
-        this.animationProjectileDuration = 400;
+        this.animationProjectileDuration = 500;
         this.bulletRay = 10;
     }
 
     drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills) {
         let sizeIncrease = kills * 4;
-        ctx.fillStyle = 'yellow';
-        ctx.beginPath();
-        ctx.arc(me.screenX, me.screenY, this.meRay + sizeIncrease/2, 0, 2 * Math.PI);
-        ctx.fill();
+        // ctx.fillStyle = 'yellow';
+        // ctx.beginPath();
+        // ctx.arc(me.screenX, me.screenY, this.meRay + sizeIncrease/2, 0, 2 * Math.PI);
+        // ctx.fill();
 
         let col;
         let angle = (180 * me.angle) / Math.PI; 
@@ -97,8 +97,6 @@ module.exports = class Render {
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay;
         ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - playerSizeIncrease, me.screenY - playerSizeIncrease, (this.meRay * 2) + sizeIncrease, (this.meRay * 2) + sizeIncrease);
         this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX - ((this.playerName.length) * 2.4 * 2), me.screenY - playerSizeIncrease - 20);
-        // ctx.fillStyle = 'red';
-        // ctx.fillRect(me.screenX - (sizeIncrease / 2 + this.meRay), me.screenY - (this.meRay + sizeIncrease / 2), 10, 10);
 
     }
 
@@ -180,7 +178,7 @@ module.exports = class Render {
 
         ctx.save();
         ctx.translate(p.x - camera.x, p.y - camera.y);
-        ctx.rotate(p.angle);
+        ctx.rotate(Math.PI + p.angle);
         ctx.translate(-(p.x - camera.x), -(p.y - camera.y));
         if (Date.now() - this.animationProjectileDuration >= this.animationProjectileTime) {
             this.currentProjectileFrame = this.currentProjectileFrame >= 3 ? 0 : this.currentProjectileFrame + 1;
