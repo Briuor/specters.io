@@ -9,8 +9,8 @@ class Game {
         this.players = [];
         this.bullets = [];
         this.map = new Map();
-        this.gameWidth = 1280;
-        this.gameHeight = 720;
+        this.gameWidth = 640;
+        this.gameHeight = 320;
         this.lastUpdateTime = Date.now();
         setInterval(this.update.bind(this), 1000 / 60);
 

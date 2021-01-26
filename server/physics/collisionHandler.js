@@ -28,7 +28,7 @@ class CollisionHandler {
         let x = c1.x - c2.x;
         let y = c1.y - c2.y;
 
-        return c1.r + c2.r > Math.sqrt((x * x) + (y * y));
+        return c1.r/2 + c2.r/2 > Math.sqrt((x * x) + (y * y));
     }
 
     static doPolygonsIntersect(a, b) {

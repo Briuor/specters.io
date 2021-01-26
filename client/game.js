@@ -6,6 +6,7 @@ const Input = require('./input');
 const Network = require('./network');
 const { Howl } = require('howler');
 const { validateName } = require('./util/validations');
+const Loader = require('./util/loader');
 
 module.exports = class Game {
     constructor() {
@@ -24,12 +25,14 @@ module.exports = class Game {
         })
         this.canvas = document.getElementById('canvas');
         this.canvas.style.background = "black";
+        this.ctx = this.canvas.getContext('2d');
+
+        this.loader = new Loader();
 
         this.kills = 0;
 
-        this.ctx = this.canvas.getContext('2d');
-        this.gameWidth = 1280;
-        this.gameHeight = 720;
+        this.gameWidth = 640;
+        this.gameHeight = 360;
         this.cwidth = window.innerWidth - 4;
         this.cheight = window.innerHeight - 4;
 
@@ -104,7 +107,6 @@ module.exports = class Game {
         let isTop10 = false;
         context.removeChilds(context.leaderBoard);
         let len = leaderBoard.length - 1;
-        console.log(len)
         for (let i = (len < 5 ? len : 4), rankPos = 1; i >= 0; i--, rankPos++) {
             let player = leaderBoard[i];
             let li = document.createElement('li');
@@ -159,7 +161,6 @@ module.exports = class Game {
 
     // Main Loop
     run() {
-        // requestAnimationFrame(this.run.bind(this))
         // get update
         const { me, otherPlayers, bullets } = this.state.getCurrentState();
 
@@ -185,10 +186,17 @@ module.exports = class Game {
         this.network.start(playerName);
 
         this.input.listen(this.network, this.camera, this.canvas);
-        Promise.all([this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this)]).then(() => {
+        Promise.all([
+            this.loader.loadImage('ghost', 'images/ghost.png'),
+            this.loader.loadImage('tileset', 'images/tileset.png'),
+            this.loader.loadImage('projectile', 'images/projectile.png'),
+            this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this)
+        ]).then(() => {
             
-            // requestAnimationFrame(this.run.bind(this))
             this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
+            this.render.playerImage = this.loader.getImage('ghost');
+            this.camera.tilesetImage = this.loader.getImage('tileset');
+            this.render.projectileImage = this.loader.getImage('projectile');
             this.lavaSound.play();
             this.windSound.play();
             this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;

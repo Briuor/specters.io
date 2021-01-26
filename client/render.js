@@ -9,8 +9,7 @@ module.exports = class Render {
         // me
         this.meId = '';
         this.playerName = 'Unammed';
-        this.playerImage = new Image();
-        this.playerImage.src = './images/ghost.png';
+        this.playerImage = null;
         this.currentFrame = 0;
         this.animationTime = Date.now();
         this.animationDuration = 100;
@@ -28,8 +27,7 @@ module.exports = class Render {
         this.odieAnimation = {};
 
         // projectile
-        this.projectileImage = new Image();
-        this.projectileImage.src = './images/projectile.png';
+        this.projectileImage = null;
         this.bulletRay = 10;
     }
 
@@ -37,7 +35,7 @@ module.exports = class Render {
         let sizeIncrease = kills * 4;
         // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
-        // ctx.arc(me.screenX, me.screenY, this.meRay + sizeIncrease/2, 0, 2 * Math.PI);
+        // ctx.arc(me.screenX, me.screenY, this.meRay/2 + sizeIncrease/2, 0, 2 * Math.PI);
         // ctx.fill();
 
         let col;
@@ -91,10 +89,9 @@ module.exports = class Render {
             this.attackAnimation = false;
         }
         
-        let playerSizeIncrease = sizeIncrease / 2 + this.meRay;
-        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - playerSizeIncrease, me.screenY - playerSizeIncrease, (this.meRay * 2) + sizeIncrease, (this.meRay * 2) + sizeIncrease);
-        this.pixelCanvas.drawName(ctx, this.playerName, 2.4, me.screenX - ((this.playerName.length) * 2.4 * 2), me.screenY - playerSizeIncrease - 20);
-
+        let playerSizeIncrease = sizeIncrease / 2 + this.meRay/2;
+        ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - playerSizeIncrease, me.screenY - playerSizeIncrease, (this.meRay) + sizeIncrease, 26 + sizeIncrease);
+        this.pixelCanvas.drawName(ctx, this.playerName, 1, Math.floor(me.screenX - (this.playerName.length * 2)), Math.floor(me.screenY - playerSizeIncrease - 7));
     }
 
     drawPlayers(ctx, otherPlayers, bullets, camera, attackSound, dieSound) {
@@ -162,22 +159,24 @@ module.exports = class Render {
         if (this.oattackAnimation[index] && this.ocurrentFrame[index] == 3 && totalFrames == 3) {
             this.oattackAnimation[index] = false;
         }
-        let playerSizeIncrease = sizeIncrease / 2 + this.meRay;
-        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay * 2 + sizeIncrease, this.meRay * 2 + sizeIncrease);
-        this.pixelCanvas.drawName(ctx, p.name, 2.5, p.x - camera.x - ((p.name.length) * 2.4 * 2), p.y - this.meRay - camera.y-20);
+
+        let playerSizeIncrease = sizeIncrease / 2 + this.meRay / 2;
+        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay + sizeIncrease, 26 + sizeIncrease);
+        this.pixelCanvas.drawName(ctx, p.name, 1, Math.floor(p.x - camera.x - (p.name.length * 2)), Math.floor(p.y - this.meRay - camera.y + 7));
     }
 
     drawBullet(ctx, p, camera) {
-        // ctx.fillStyle = p.color;
+        // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
-        // ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
+        // ctx.arc(p.x - this.bulletRay - camera.x, p.y - this.bulletRay - camera.y, this.bulletRay/2, 0, 2 * Math.PI);
         // ctx.fill();
 
         ctx.save();
         ctx.translate(p.x - camera.x, p.y - camera.y);
         ctx.rotate(Math.PI + p.angle);
         ctx.translate(-(p.x - camera.x), -(p.y - camera.y));
-        ctx.drawImage(this.projectileImage, 0, 0, this.bulletRay, this.bulletRay, p.x - this.bulletRay - camera.x, p.y - this.bulletRay - camera.y, this.bulletRay*2, this.bulletRay*2);
+        console.log(p.r)
+        ctx.drawImage(this.projectileImage, 0, 0, this.bulletRay, this.bulletRay, p.x - p.r/2 - camera.x, p.y - p.r - camera.y, p.r, p.r);
         ctx.restore();
     }
 }

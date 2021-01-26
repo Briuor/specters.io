@@ -37,25 +37,25 @@ module.exports = class Camera {
         this.maxX = map.cols * map.tsize - w;
         this.maxY = map.rows * map.tsize - h;
         this.following = null;
-        this.tileSetImage = new Image();
-        this.tileSetImage.src = './images/tileset.png';
+        this.tilesetImage = null;
         this.animations = {
-            38: new Animator([38, 39, 40, 41, 42, 60], 15),
-            55: new Animator([57, 58, 59, 60, 55, 56], 15),
+            22: new Animator([22, 23, 24, 25, 26, 38], 16),
+            28: new Animator([29, 30, 31, 32, 38, 28], 16),
+            33: new Animator([38, 33, 34, 35, 36, 37], 16),
         };
 
     }
 
     follow(me) {
         this.following = me;
-        me.screenX = 0;
-        me.screenY = 0;
+        me.screenX = this.w / 2;
+        me.screenY = this.h / 2;
     }
 
     update() {
         // Center player on screen
-        this.following.screenX = this.w / 2;
-        this.following.screenY = this.h / 2;
+        // this.following.screenX = this.w / 2;
+        // this.following.screenY = this.h / 2;
 
         // camera follow the player
         this.x = this.following.x - this.w / 2;
@@ -64,9 +64,7 @@ module.exports = class Camera {
 
     draw(ctx, map) {
         Object.values(this.animations).forEach(animator => {
-
             animator.animate();
-
         });
         var startCol = Math.floor(this.x / map.tsize);
         var endCol = startCol + (this.w / map.tsize)+1;
@@ -74,26 +72,20 @@ module.exports = class Camera {
         var endRow = startRow + (this.h / map.tsize)+1;
         var offsetX = -this.x + startCol * map.tsize;
         var offsetY = -this.y + startRow * map.tsize;
-
         for (var c = startCol; c <= endCol; c++) {
             for (var r = startRow; r <= endRow; r++) {
                 var tile = map.getTile(c, r);
                 var x = (c - startCol) * map.tsize + offsetX;
                 var y = (r - startRow) * map.tsize + offsetY;
-                
-                if (this.animations[tile]) {
-                    tile = this.animations[tile].frame_value;
-                }
 
-                let ty = 0;
-                if (typeof tile === 'undefined' )
-                    ctx.drawImage(this.tileSetImage, (11 - 1) * map.tsize, 0, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
-                else {
-                    if (tile > 17) {
-                        ty = Math.floor((tile / 17));
-                        tile = (tile % 17);
+                if (tile == 57 || tile == 37) {
+                    ctx.fillStyle = tile == 57 ? "#252525" : "#ff0000";
+                    ctx.fillRect(Math.floor(x), Math.floor(y), map.tsize, map.tsize);
+                } else {
+                    if (this.animations[tile]) {
+                        tile = this.animations[tile].frame_value;
                     }
-                    ctx.drawImage(this.tileSetImage, (tile - 1) * map.tsize, ty * 57, map.tsize, map.tsize, Math.round(x), Math.round(y), map.tsize, map.tsize);
+                    ctx.drawImage(this.tilesetImage, Math.floor((tile - 1) * map.tsize), 0, map.tsize, map.tsize, Math.floor(x), Math.floor(y), map.tsize, map.tsize);
                 }
             }
         }

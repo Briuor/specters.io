@@ -6,10 +6,10 @@ class Player {
         this.x = x;
         this.y = y;
         this.kills = 0;
-        this.r = 28;
+        this.r = 28 + this.kills * 4; // 28 initial ray;
         this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
-        this.speed = 180;
+        this.speed = 100;
         this.color = '#fff';
         this.angle = 0;
         this.impulsed = false;
@@ -25,11 +25,11 @@ class Player {
         this.dieTime = 0;
     }
     serializeMe() {
-        return [Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2)), this.kills];
+        return [this.x, this.y, this.angle, this.kills];
     }
 
     serialize() {
-        return [this.id, this.name, Number(this.x.toFixed(2)), Number(this.y.toFixed(2)), Number(this.angle.toFixed(2)), this.kills];
+        return [this.id, this.name, this.x, this.y, this.angle, this.kills];
     }
 
     leaderBoardSerialize() {
@@ -45,11 +45,12 @@ class Player {
             this.impulseVel *= 0.9;
         } else {
             this.impulsed = false;
+            if (this.direction.right) this.x += this.speed * dt;
+            if (this.direction.left) this.x -= this.speed * dt;
+            if (this.direction.up) this.y -= this.speed * dt;
+            if (this.direction.down) this.y += this.speed * dt;
         }
-        if (this.direction.right) this.x += this.speed * dt;
-        if (this.direction.left) this.x -= this.speed * dt;
-        if (this.direction.up) this.y -= this.speed * dt;
-        if (this.direction.down) this.y += this.speed * dt;
+
         this.x = Math.max(0, Math.min(MAP_SIZE, this.x));
         this.y = Math.max(0, Math.min(MAP_SIZE, this.y));
     }
@@ -69,7 +70,7 @@ class Player {
         if (Date.now() - this.shootCooldown >= this.shootTime) {
             this.shootTime = Date.now();
             this.shot = true;
-            return new Bullet(this.x, this.y, 10, this.angle, ownerId, this.r);
+            return new Bullet(this.x, this.y, 10, this.angle, ownerId, this.r, this.kills);
         }
         return false;
     }

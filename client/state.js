@@ -30,7 +30,7 @@ module.exports = class State {
 
         const base = this.getBaseUpdate();
         const serverTime = this.currentServerTime();
-
+        // console.log(this.updates.length);
         if (base < 0 || base === this.updates.length - 1) {
             return this.updates[this.updates.length - 1];
         } else {
@@ -41,7 +41,6 @@ module.exports = class State {
                 me: this.interpolateObject(baseUpdate.me, next.me, ratio),
                 otherPlayers: this.interpolateObjectArray(baseUpdate.otherPlayers, next.otherPlayers, ratio),
                 bullets: this.interpolateObjectArray(baseUpdate.bullets, next.bullets, ratio),
-                leaderBoard: baseUpdate.leaderBoard
             };
         }
     }
@@ -53,8 +52,9 @@ module.exports = class State {
 
         const interpolated = {};
         Object.keys(object1).forEach(key => {
-            if (key == 'x' || key == 'y')
-                interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;
+            if (key == 'x' || key == 'y') {
+                interpolated[key] = object1[key] + (object2[key] - object1[key]) * ratio;                    
+            }
             else
                 interpolated[key] = object2[key];
         });
@@ -83,7 +83,7 @@ module.exports = class State {
     }
 
     deserializeBullet(buffer) {
-        return { id: buffer[0], x: buffer[1], y: buffer[2], angle: buffer[3] };
+        return { id: buffer[0], x: buffer[1], y: buffer[2], angle: buffer[3], r: buffer[4] };
     }
 
     deserializeLeaderBoard(buffer) {
