@@ -27,9 +27,8 @@ module.exports = class Network {
                 clearInterval(loopRef);
             })
             this.channel.on('leaderboard', (leaderboard) => {
-                console.log('received')
-                // let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
-                // updateLeaderBoard(deserialized, gameCtx);
+                let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
+                updateLeaderBoard(deserialized, gameCtx);
             })
             this.channel.on('attack', (id) => {
                 render.attackList.push(id);

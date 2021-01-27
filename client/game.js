@@ -55,6 +55,9 @@ module.exports = class Game {
         this.camera = new Camera(this.gameWidth, this.gameHeight, this.map);
         this.state = new State();
         this.network = new Network();
+        window.onbeforeunload = () => {
+            this.network.channel.close();
+        };
         this.render = new Render();
         this.input = new Input();
         this.loopRef = null;
@@ -87,54 +90,26 @@ module.exports = class Game {
         this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
     }
 
-    removeChilds(node) {
-        var last;
-        while (last = node.lastChild) node.removeChild(last);
-    }
 
     updateLeaderBoard(leaderBoard, context) {
-        let isTop10 = false;
-        context.removeChilds(context.leaderBoard);
-        let len = leaderBoard.length - 1;
-        for (let i = (len < 5 ? len : 4), rankPos = 1; i >= 0; i--, rankPos++) {
+        let liList = context.leaderBoard.children;
+        for (let i = 0; i < liList.length; i++){
             let player = leaderBoard[i];
-            let li = document.createElement('li');
-            let spanName = document.createElement('span');
+            let nameEl = liList[i].children[0];
+            let scoreEl = liList[i].children[1];
             let highlight = '';
-            if (player.id == context.render.meId) {
-                isTop10 = true;
-                highlight = '>';
-                spanName.style.marginLeft -= 13;
+            if (player) {
+                if (player.id == context.render.meId) {
+                    console.log(player.id, context.render.meId)
+                    highlight = '>';
+                }
+                nameEl.innerText = highlight + (i == 5 ? '?.-' : (i + 1)+'.'+player.name);
+                scoreEl.innerText = player.score;
             }
-            let textnode = document.createTextNode(highlight + ' ' + (rankPos) + '. ' +player.name);
-            spanName.appendChild(textnode);
-
-            let spanScore = document.createElement('span');
-            spanScore.className = 'leaderboard-score';
-            textnode = document.createTextNode(player.score);
-            spanScore.appendChild(textnode);
-
-
-            li.appendChild(spanName);
-            li.appendChild(spanScore);
-            context.leaderBoard.appendChild(li);
-        }
-        if (!isTop10) {
-            let li = document.createElement('li');
-            let spanName = document.createElement('span');
-            spanName.style.marginLeft -= 13;
-            textnode = document.createTextNode('> ?. ' + localStorage.getItem('name'));
-            spanName.appendChild(textnode);
-            let spanScore = document.createElement('span');
-            spanScore.className = 'leaderboard-score';
-            textnode = document.createTextNode(context.kills);
-            spanScore.appendChild(textnode);
-
-
-            li.appendChild(spanName);
-            li.appendChild(spanScore);
-            context.leaderBoard.appendChild(li);
-
+            else {
+                nameEl.innerText = highlight + (i == 5 ? '?.-' : (i + 1) +'.-');
+                scoreEl.innerText = '-';                
+            }
         }
         context.leaderBoardWrapper.style.marginRight = context.canvas.getBoundingClientRect().left;
 

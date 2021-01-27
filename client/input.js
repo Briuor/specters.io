@@ -18,6 +18,7 @@ module.exports = class Input {
     }
 
     handleKeyBoardInput(e, value, network) {
+        console.log('input')
         if (this.isDirection(e.which))
             network.channel.emit('ik', [e.which,value]);
     }

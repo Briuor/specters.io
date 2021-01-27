@@ -68,7 +68,7 @@ input.name:focus {
 div#leaderboard-wrapper {
   position: absolute;
   right: 20px;
-  top: 0;
+  top: 10px;
   text-align: center;
    -moz-user-select: none; 
   -webkit-user-select: none;
