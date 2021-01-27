@@ -1,53 +1,44 @@
 const path = require('path');
-const express = require('express');
+const geckos = require('@geckos.io/server').default
+const http = require('http')
+const express = require('express')
+const app = express()
+const server = http.createServer(app)
+const io = geckos()
 const cors = require('cors');
-const app = express();
-const http = require('http').createServer(app);
-// const customParser = require('socket.io-msgpack-parser');
-
-const options = {
-    cors: true,
-    origins: ["http://127.0.0.1:80", "http://127.0.0.1:3000"],
-    transport: ['websocket'],
-    // parser: customParser
-}
-const io = require('socket.io')(http, options);
 const Game = require('./game');
-
-const PORT = 3000;
 
 app.use(express.static(path.join(__dirname, '..', 'dist')));
 app.use(cors());
 
-http.listen(PORT, () => {
-    console.log('listening on *:' + PORT);
-});
+io.addServer(server);
+server.listen(3000);
 
-io.on('connection', socket => {
+io.onConnection( channel => {
 
-    socket.on('join', (playerName) => {
-        game.addPlayer(socket, playerName);
-        console.log(socket.id + ' connected');
+    channel.on('join', (playerName) => {
+        game.addPlayer(channel, playerName);
+        console.log(channel.id + ' connected');
     });
 
-    socket.on('imc', () => {
-        game.handleInput(socket, null, 'mouseclick');
-        // console.log(socket.id + ' pressed');
+    channel.on('imc', () => {
+        game.handleInput(channel, null, 'mouseclick');
+        // console.log(channel.id + ' pressed');
     });
 
-    socket.on('imm', (input) => {
-        game.handleInput(socket, input, 'mousemove');
-        // console.log(socket.id + ' pressed');
+    channel.on('imm', (input) => {
+        game.handleInput(channel, input, 'mousemove');
+        // console.log(channel.id + ' pressed');
     });
 
-    socket.on('ik', (input) => {
-        game.handleInput(socket, input, 'keyboard');
-        // console.log(socket.id + ' pressed');
+    channel.on('ik', (input) => {
+        game.handleInput(channel, input, 'keyboard');
+        // console.log(channel.id + ' pressed');
     });
     
-    socket.on('disconnect', () => {
-        game.removePlayer(socket);
-        console.log(socket.id + ' disconnected');
+    channel.onDisconnect(() => {
+        game.removePlayer(channel);
+        console.log(channel.id + ' disconnected');
     });
     
 });

@@ -51,17 +51,6 @@ module.exports = class Game {
             src: ['./sounds/die.mp3'],
             volume: 0.4,
         });
-        this.lavaSound = new Howl({
-            src: ['./sounds/lava.mp3'],
-            volume: 0.3,
-            loop: true,
-        });
-        this.windSound = new Howl({
-            src: ['./sounds/wind.ogg'],
-            volume: 0.1,
-            loop: true,
-        });
-
         this.map = new Map();
         this.camera = new Camera(this.gameWidth, this.gameHeight, this.map);
         this.state = new State();
@@ -152,7 +141,7 @@ module.exports = class Game {
     }
 
     gameOver() {
-        this.network.socket.disconnect();
+        this.network.channel.close();
         clearInterval(this.loopRef);
         this.playAgainModal.style.display = "block";
         this.killsElement.innerText = this.kills + " Kills";
@@ -197,8 +186,6 @@ module.exports = class Game {
             this.render.playerImage = this.loader.getImage('ghost');
             this.camera.tilesetImage = this.loader.getImage('tileset');
             this.render.projectileImage = this.loader.getImage('projectile');
-            this.lavaSound.play();
-            this.windSound.play();
             this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
             this.leaderBoardWrapper.style.display = 'block';
         });

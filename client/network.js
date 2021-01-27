@@ -1,14 +1,19 @@
-const ioc = require('socket.io-client');
+const geckos = require('@geckos.io/client').default;
+
 module.exports = class Network {
     start(name) {
         this.name = name;
-        this.socket = ioc('ws://localhost:3000');
+        this.channel = geckos({ port: 3000 });
         
 
-        this.connectPromise = new Promise(resolve => {
-            this.socket.on('connect', () => {
-                this.socket.emit('join', this.name);
-                resolve(this.socket.id);
+        this.connectPromise = new Promise((resolve, reject) => {
+            this.channel.onConnect(error => {
+                if (error) {
+                    console.error(error.message);
+                    reject();
+                }
+                this.channel.emit('join', this.name);
+                resolve(this.channel.id);
             });
         })
     }
@@ -17,16 +22,19 @@ module.exports = class Network {
         this.connectPromise.then((socketId) => {
             render.meId = socketId;
             render.playerName = localStorage.getItem('name');
-            this.socket.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
-            this.socket.on('disconnect', () => { clearInterval(loopRef) })
-            this.socket.on('leaderboard', (leaderboard) => {
-                let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
-                updateLeaderBoard(deserialized, gameCtx);
+            this.channel.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
+            this.channel.onDisconnect(() => {
+                clearInterval(loopRef);
             })
-            this.socket.on('attack', (id) => {
+            this.channel.on('leaderboard', (leaderboard) => {
+                console.log('received')
+                // let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
+                // updateLeaderBoard(deserialized, gameCtx);
+            })
+            this.channel.on('attack', (id) => {
                 render.attackList.push(id);
             })
-            this.socket.on('die', (id) => {
+            this.channel.on('die', (id) => {
                 render.dieList.push(id);
             })
         })

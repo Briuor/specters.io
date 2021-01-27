@@ -19,18 +19,18 @@ module.exports = class Input {
 
     handleKeyBoardInput(e, value, network) {
         if (this.isDirection(e.which))
-            network.socket.emit('ik', [e.which,value]);
+            network.channel.emit('ik', [e.which,value]);
     }
 
     handleMouseClick(network) {
-        network.socket.emit('imc');
+        network.channel.emit('imc');
     }
 
     handleMouseMove(e, network, camera, canvas) {
         if (camera.following) {
             const distX = e.clientX - canvas.getBoundingClientRect().left - camera.following.scX;
             const distY = e.clientY - canvas.getBoundingClientRect().top - camera.following.scY;
-            network.socket.emit('imm',  [distX, distY]);
+            network.channel.emit('imm',  [distX, distY]);
         }
     }
 
