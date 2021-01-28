@@ -112,7 +112,6 @@ module.exports = class Game {
             }
         }
         context.leaderBoardWrapper.style.marginRight = context.canvas.getBoundingClientRect().left;
-
     }
 
     gameOver() {
