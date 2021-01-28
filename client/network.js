@@ -22,13 +22,15 @@ module.exports = class Network {
         this.connectPromise.then((socketId) => {
             render.meId = socketId;
             render.playerName = localStorage.getItem('name');
-            this.channel.on('update', (newUpdate) => { state.handleUpdate(newUpdate) })
+            this.channel.on('update', (newUpdate) => {
+                state.handleUpdate(newUpdate)
+            })
             this.channel.onDisconnect(() => {
                 clearInterval(loopRef);
             })
             this.channel.on('leaderboard', (leaderboard) => {
-                let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
-                updateLeaderBoard(deserialized, gameCtx);
+                // let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
+                // updateLeaderBoard(deserialized, gameCtx);
             })
             this.channel.on('attack', (id) => {
                 render.attackList.push(id);

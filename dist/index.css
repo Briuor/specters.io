@@ -24,7 +24,13 @@ div.game-name {
 
 canvas {
     display: none;
-    margin: 0 auto;
+    position: 'absolute';
+top: 0;
+width: '100%';
+height: '100%';
+pointer-events: 'none';
+z-index: 100;
+
 }
 
 form#play-form {

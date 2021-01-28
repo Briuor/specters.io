@@ -1,6 +1,7 @@
 module.exports = class State {
 
-    constructor() {
+    constructor(si) {
+        this.SI = si;
         this.firstServerTimestamp = 0;
         this.gameStart = 0;
         this.updates = [];
@@ -90,17 +91,7 @@ module.exports = class State {
         return { name: buffer[0], score: buffer[1] };
     }
 
-    handleUpdate(updateBuffer) {
-        const newUpdate = this.deserialize(updateBuffer);
-        if (!this.firstServerTimestamp) {
-            this.firstServerTimestamp = newUpdate.t;
-            this.gameStart = Date.now();
-        }
-
-        this.updates.push(newUpdate);
-        const base = this.getBaseUpdate();
-        if (base > 0) {
-            this.updates.splice(0, base);
-        }
+    handleUpdate(update) {
+        this.SI.snapshot.add(update);
     }
 }

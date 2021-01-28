@@ -25,15 +25,15 @@ class Player {
         this.dieTime = 0;
     }
     serializeMe() {
-        return [this.x, this.y, this.angle, this.kills];
+        return { id: this.id, x:this.x, y:this.y, angle:this.angle, kills: this.kills };
     }
 
     serialize() {
-        return [this.id, this.name, this.x, this.y, this.angle, this.kills];
+        return { id: this.id, name: this.name, x: this.x, y: this.y, angle:this.angle, kills: this.kills };
     }
 
     leaderBoardSerialize() {
-        return [this.id, this.name, this.kills];
+        return { id: this.id, name: this.name, kills: this.kills };
     }
 
     move(dt) {

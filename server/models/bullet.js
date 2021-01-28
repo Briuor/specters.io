@@ -13,7 +13,7 @@ class Bullet {
     }
 
     serialize() {
-        return [this.id, this.x, this.y, this.angle, this.r];
+        return { id: this.id, x: this.x, y: this.y, angle: this.angle, r: this.r };
     }
 
     move(dt) {

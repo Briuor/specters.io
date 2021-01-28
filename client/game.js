@@ -7,6 +7,8 @@ const Network = require('./network');
 const { Howl } = require('howler');
 const { validateName } = require('./util/validations');
 const Loader = require('./util/loader');
+const { SnapshotInterpolation } = require('@geckos.io/snapshot-interpolation');
+const Player = require('../server/models/player');
 
 module.exports = class Game {
     constructor() {
@@ -16,6 +18,9 @@ module.exports = class Game {
         this.playAgainForm = document.getElementById('play-again-form');
         this.namePlayAgainTextField = document.getElementById('name-play-again');
         this.killsElement = document.getElementById('kills');
+
+        this.SI = new SnapshotInterpolation(60);
+        this.lastUpdateTime = 0;
 
         this.playAgainForm.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -53,11 +58,12 @@ module.exports = class Game {
         });
         this.map = new Map();
         this.camera = new Camera(this.gameWidth, this.gameHeight, this.map);
-        this.state = new State();
+        this.state = new State(this.SI);
         this.network = new Network();
         window.onbeforeunload = () => {
             this.network.channel.close();
         };
+        this.player = new Player(null, 'b', 700, 600);
         this.render = new Render();
         this.input = new Input();
         this.loopRef = null;
@@ -124,13 +130,22 @@ module.exports = class Game {
 
     // Main Loop
     run() {
+        let now = Date.now();
+        let dt = (now - this.lastUpdateTime) / 1000;
+        this.lastUpdateTime = now;
+        this.player.move(dt);
+
         // get update
-        const { me, otherPlayers, bullets } = this.state.getCurrentState();
+        const snapshot = this.SI.calcInterpolation('x y');
 
-        if (!me) return;
-        this.kills = me.kills;
+        const { state } = snapshot;
 
-        this.camera.follow(me);
+        const me = state[0];
+        // console.log(state[0])
+
+        // this.kills = me.kills;
+        console.log(this.player)
+        this.camera.follow(this.player);
         this.camera.update();
         this.camera.following.scX = this.cwidth / 2;
         this.camera.following.scY = this.cheight / 2;
@@ -140,15 +155,15 @@ module.exports = class Game {
 
         // draw
         this.camera.draw(this.ctx, this.map);
-        this.render.drawPlayer(this.ctx, me, this.gameOver, this.attackSound, this.dieSound, this.kills);
-        this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
+        this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
+        // this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
     }
 
     start(playerName) {
         this.canvas.style.display = 'block';
         this.network.start(playerName);
 
-        this.input.listen(this.network, this.camera, this.canvas);
+        this.input.listen(this.network, this.camera, this.canvas, this.player);
         Promise.all([
             this.loader.loadImage('ghost', 'images/ghost.png'),
             this.loader.loadImage('tileset', 'images/tileset.png'),

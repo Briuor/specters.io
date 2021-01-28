@@ -1,10 +1,13 @@
 const Player = require('./models/player');
 const Map = require('../shared/map');
 const CollisionHandler = require('./physics/collisionHandler');
+const { SnapshotInterpolation } = require('@geckos.io/snapshot-interpolation');
+
 
 class Game {
     constructor(io) {
         this.io = io;
+        this.SI = new SnapshotInterpolation();
         this.channels = [];
         this.players = [];
         this.bullets = [];
@@ -20,9 +23,9 @@ class Game {
 
     addPlayer(channel, name) {
         this.channels[channel.id] = channel;
-        const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
-        let { x, y } = respawnList[Math.round(Math.random() * 2)];
-        this.players[channel.id] = new Player(channel.id, name, x, y);
+        // const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
+        // let { x, y } = respawnList[Math.round(Math.random() * 2)];
+        this.players[channel.id] = new Player(channel.id, name, 700, 600);
     }
 
     removePlayer(channel) {
@@ -127,7 +130,6 @@ class Game {
                     }
                 }).map(p => p.leaderBoardSerialize()).splice(0, 5);
             this.io.emit('leaderboard', leaderBoard);
-            console.log('sent')
         }
 
         // send update event to each client
@@ -141,9 +143,16 @@ class Game {
             let me = this.players[channelId].serializeMe();
             let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
             let bullets = nearbyBullets.map(b => b.serialize());
-            let msg = [me, otherPlayers, bullets, Date.now()];
+            let players = [me]
+            if (otherPlayers.length > 0) {
+                players = [me, ...otherPlayers];
+            }
+            let worldState = players;
+            console.log(worldState)
 
-            this.channels[channelId].emit('update', msg);
+            const snapshot = this.SI.snapshot.create(worldState)
+
+            this.channels[channelId].emit('update', snapshot);
         });
 
     }
