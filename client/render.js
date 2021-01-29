@@ -31,7 +31,7 @@ module.exports = class Render {
         this.bulletRay = 10;
     }
 
-    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills) {
+    drawPlayer(ctx, me, gameOver, kills) {
         let sizeIncrease = kills * 4;
         // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
@@ -46,7 +46,6 @@ module.exports = class Render {
             this.currentFrame = 0;
             this.attackAnimation = true;
             this.attackList.splice(this.attackList.findIndex(id => this.meId == id), 1);
-            attackSound.play();
         }
 
         if (this.dieList.length > 0 && this.dieList.includes(this.meId)) {
@@ -54,7 +53,6 @@ module.exports = class Render {
             this.currentFrame = 0;
             this.dieAnimation = true;
             this.dieList.splice(this.dieList.findIndex(id => this.meId == id), 1);
-            dieSound.play();
         }
         else {
             if (angle >= 45 && angle < 135) { //right
@@ -94,12 +92,12 @@ module.exports = class Render {
         this.pixelCanvas.drawName(ctx, this.playerName, 1, Math.floor(me.screenX - (this.playerName.length * 2)), Math.floor(me.screenY - playerSizeIncrease - 7));
     }
 
-    drawPlayers(ctx, otherPlayers, bullets, camera, attackSound, dieSound) {
-        otherPlayers.forEach((p, index) => this.drawOther(ctx, p, camera, p.id, attackSound, dieSound));
+    drawPlayers(ctx, otherPlayers, bullets, camera) {
+        otherPlayers.forEach((p, index) => this.drawOther(ctx, p, camera, p.id));
         bullets.forEach(b => this.drawBullet(ctx, b, camera));
     }
 
-    drawOther(ctx, p, camera, index, attackSound, dieSound) {
+    drawOther(ctx, p, camera, index) {
         let sizeIncrease = p.kills * 4;
 
         // ctx.fillStyle = p.color;
@@ -121,14 +119,12 @@ module.exports = class Render {
             this.ocurrentFrame[index] = 0;
             this.oattackAnimation[index] = true;
             this.attackList.splice(this.attackList.findIndex(id => p.id == id), 1);
-            attackSound.play();
         }
         if (this.dieList.length > 0 && this.dieList.includes(p.id)) {
             this.oattackAnimation[index] = false;
             this.ocurrentFrame[index] = 0;
             this.odieAnimation[index] = true;
             this.dieList.splice(this.dieList.findIndex(id => p.id == id), 1);
-            dieSound.play();
         }
         let col;
         if (angle >= 45 && angle < 135) { //right

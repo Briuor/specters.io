@@ -43,14 +43,6 @@ module.exports = class Game {
     }
 
     init() {
-        this.attackSound = new Howl({
-            src: ['./sounds/attack.mp3'],
-            volume: 1,
-        });
-        this.dieSound = new Howl({
-            src: ['./sounds/die.mp3'],
-            volume: 0.4,
-        });
         this.map = new Map();
         this.camera = new Camera(this.gameWidth, this.gameHeight, this.map);
         this.state = new State();
@@ -100,7 +92,6 @@ module.exports = class Game {
             let highlight = '';
             if (player) {
                 if (player.id == context.render.meId) {
-                    console.log(player.id, context.render.meId)
                     highlight = '>';
                 }
                 nameEl.innerText = highlight + (i == 5 ? '?.-' : (i + 1)+'.'+player.name);
@@ -140,8 +131,8 @@ module.exports = class Game {
 
         // draw
         this.camera.draw(this.ctx, this.map);
-        this.render.drawPlayer(this.ctx, me, this.gameOver, this.attackSound, this.dieSound, this.kills);
-        this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
+        this.render.drawPlayer(this.ctx, me, this.gameOver, this.kills);
+        this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera);
     }
 
     start(playerName) {

@@ -13,7 +13,7 @@ class Game {
         this.gameHeight = 320;
         this.lastUpdateTime = Date.now();
         setInterval(this.update.bind(this), 1000 / 60);
-
+        this.tick = 0;
         this.leaderBoardDelay = 1000;
         this.lastLeaderBoardUpdate = Date.now();
     }
@@ -62,6 +62,8 @@ class Game {
         let now = Date.now();
         let dt = (now - this.lastUpdateTime) / 1000;
         this.lastUpdateTime = now;
+
+        this.tick++;
         // move player
         let dieList = [];
         Object.keys(this.players).forEach(playerId => {
@@ -127,24 +129,25 @@ class Game {
                     }
                 }).map(p => p.leaderBoardSerialize()).splice(0, 5);
             this.io.emit('leaderboard', leaderBoard);
-            console.log('sent')
         }
 
         // send update event to each client
-        Object.keys(this.channels).forEach(channelId => {
-            const nearbyPlayers = Object.values(this.players).filter(
-                p => p !== this.players[channelId] && p.distanceTo(this.players[channelId]) <= (this.gameWidth+190) / 2,
-            );
-            const nearbyBullets = this.bullets.filter(
-                b => b.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
-            );
-            let me = this.players[channelId].serializeMe();
-            let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
-            let bullets = nearbyBullets.map(b => b.serialize());
-            let msg = [me, otherPlayers, bullets, Date.now()];
+        if (this.tick % 4 === 0) {
+            Object.keys(this.channels).forEach(channelId => {
+                const nearbyPlayers = Object.values(this.players).filter(
+                    p => p !== this.players[channelId] && p.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
+                );
+                const nearbyBullets = this.bullets.filter(
+                    b => b.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
+                );
+                let me = this.players[channelId].serializeMe();
+                let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
+                let bullets = nearbyBullets.map(b => b.serialize());
+                let msg = [me, otherPlayers, bullets, Date.now()];
 
-            this.channels[channelId].emit('update', msg);
-        });
+                this.channels[channelId].emit('update', msg);
+            });
+        }
 
     }
 }

@@ -85,7 +85,8 @@ module.exports = class Camera {
                     if (this.animations[tile]) {
                         tile = this.animations[tile].frame_value;
                     }
-                    ctx.drawImage(this.tilesetImage, Math.floor((tile - 1) * map.tsize), 0, map.tsize, map.tsize, Math.floor(x), Math.floor(y), map.tsize, map.tsize);
+                    tile -= 1;
+                    ctx.drawImage(this.tilesetImage, tile * map.tsize, 0, map.tsize, map.tsize, Math.floor(x), Math.floor(y), map.tsize, map.tsize);
                 }
             }
         }

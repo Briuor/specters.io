@@ -6,6 +6,7 @@ window.onload = () => {
     const playForm = document.getElementById('play-form');
     const body = document.getElementsByTagName('body')[0];
     const name = document.getElementById('name-play');
+    
     const gameName = document.getElementsByClassName('game-name')[0];
     name.focus();
     playForm.addEventListener('submit', (e) => {
