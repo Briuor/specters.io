@@ -78,8 +78,8 @@ module.exports = class Camera {
                 var x = (c - startCol) * map.tsize + offsetX;
                 var y = (r - startRow) * map.tsize + offsetY;
 
-                if (tile == 57 || tile == 37) {
-                    ctx.fillStyle = tile == 57 ? "#252525" : "#ff0000";
+                if (tile == 38 || tile == 15) {
+                    ctx.fillStyle = tile == 15 ? "#252525" : "#ff0000";
                     ctx.fillRect(Math.floor(x), Math.floor(y), map.tsize, map.tsize);
                 } else {
                     if (this.animations[tile]) {
