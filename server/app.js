@@ -31,8 +31,8 @@ io.onConnection( channel => {
         // console.log(channel.id + ' pressed');
     });
 
-    channel.on('ik', (input) => {
-        game.handleInput(channel, input, 'keyboard');
+    channel.on('ik', (direction) => {
+        game.handleInput(channel, direction, 'keyboard');
         // console.log(channel.id + ' pressed');
     });
     

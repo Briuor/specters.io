@@ -94,15 +94,20 @@ class Player {
         this.speed += this.speed <= 300 ? 10 : 0;
     }
 
-    updateDirection({ keyCode, value }) {
-        if (keyCode == 68 || keyCode == 39)
-            this.direction.right = value;
-        else if (keyCode == 83 || keyCode == 40)
-            this.direction.down = value;
-        else if (keyCode == 65 || keyCode == 37)
-            this.direction.left = value;
-        else if (keyCode == 87 || keyCode == 38)
-            this.direction.up = value;
+    updateDirection({ keyCode, value, direction = null }) {
+        if (direction) {
+            this.direction = direction;
+        }
+        else {
+            if (keyCode == 68 || keyCode == 39)
+                this.direction.right = value;
+            else if (keyCode == 83 || keyCode == 40)
+                this.direction.down = value;
+            else if (keyCode == 65 || keyCode == 37)
+                this.direction.left = value;
+            else if (keyCode == 87 || keyCode == 38)
+                this.direction.up = value;
+        }
     }
 
     distanceTo(object) {

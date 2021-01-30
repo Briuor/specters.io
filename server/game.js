@@ -56,7 +56,7 @@ class Game {
                 }
             }
             else if (type == 'keyboard') {
-                this.players[channel.id].updateDirection({ keyCode:input[0], value: input[1] });
+                this.players[channel.id].updateDirection({ direction: input });
             }
         }
     }
@@ -143,12 +143,15 @@ class Game {
             let me = this.players[channelId].serializeMe();
             let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
             let bullets = nearbyBullets.map(b => b.serialize());
-            let players = [me]
-            if (otherPlayers.length > 0) {
-                players = [me, ...otherPlayers];
-            }
-            let worldState = players;
-            console.log(worldState)
+            // let players = [me]
+            // if (otherPlayers.length > 0) {
+            //     players = [me, ...otherPlayers];
+            // }
+            let worldState = {
+                me: [me],
+                otherPlayers,
+                bullets
+            };
 
             const snapshot = this.SI.snapshot.create(worldState)
 

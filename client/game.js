@@ -7,7 +7,7 @@ const Network = require('./network');
 const { Howl } = require('howler');
 const { validateName } = require('./util/validations');
 const Loader = require('./util/loader');
-const { SnapshotInterpolation } = require('@geckos.io/snapshot-interpolation');
+const { SnapshotInterpolation, Vault } = require('@geckos.io/snapshot-interpolation');
 const Player = require('../server/models/player');
 
 module.exports = class Game {
@@ -20,6 +20,8 @@ module.exports = class Game {
         this.killsElement = document.getElementById('kills');
 
         this.SI = new SnapshotInterpolation(60);
+        this.playerVault = new Vault();
+
         this.lastUpdateTime = 0;
 
         this.playAgainForm.addEventListener("submit", (e) => {
@@ -64,6 +66,8 @@ module.exports = class Game {
             this.network.channel.close();
         };
         this.player = new Player(null, 'b', 700, 600);
+        this.otherPlayers = [];
+        this.bullets = [];
         this.render = new Render();
         this.input = new Input();
         this.loopRef = null;
@@ -106,7 +110,6 @@ module.exports = class Game {
             let highlight = '';
             if (player) {
                 if (player.id == context.render.meId) {
-                    console.log(player.id, context.render.meId)
                     highlight = '>';
                 }
                 nameEl.innerText = highlight + (i == 5 ? '?.-' : (i + 1)+'.'+player.name);
@@ -133,18 +136,48 @@ module.exports = class Game {
         let now = Date.now();
         let dt = (now - this.lastUpdateTime) / 1000;
         this.lastUpdateTime = now;
+
+        // send move to server
+        this.network.channel.emit('ik', this.player.direction);
+
+        // client prediction
         this.player.move(dt);
+        this.playerVault.add(this.SI.snapshot.create([{ id: this.network.channel.id, x: this.player.x, y: this.player.y }]));
 
-        // get update
-        const snapshot = this.SI.calcInterpolation('x y');
+        // reconciliation
+        const serverSnapshot = this.SI.vault.get();
+        // get the closest player snapshot that matches the server snapshot time
+        const playerSnapshot = this.playerVault.get(serverSnapshot.time, true)
+        if (serverSnapshot && playerSnapshot) {
+            // get the current player position on the server
+            const serverPos = serverSnapshot.state.me[0];
 
-        const { state } = snapshot;
+            // calculate the offset between server and client
+            const offsetX = playerSnapshot.state[0].x - serverPos.x
+            const offsetY = playerSnapshot.state[0].y - serverPos.y    
+            // this.me = { x: serverPos.x, y: serverPos.y };
+            // check if the player is currently on the move
+            // const isMoving = this.player.direction.left || this.player.direction.up || this.player.direction.right || this.player.direction.down
 
-        const me = state[0];
-        // console.log(state[0])
+            // we correct the position faster if the player moves
+            // const correction = isMoving ? 60 : 180
+            const correction = 40;
 
-        // this.kills = me.kills;
-        console.log(this.player)
+            // apply a step by step correction of the player's position
+            this.player.x -= offsetX / correction
+            this.player.y -= offsetY / correction
+        }
+
+        // interpolation
+        const otherPlayersSnapshot = this.SI.calcInterpolation('x y', 'otherPlayers');
+        if (otherPlayersSnapshot) {
+            this.otherPlayers = otherPlayersSnapshot.state;
+        }
+        const bulletsSnapshot = this.SI.calcInterpolation('x y', 'bullets');
+        if (bulletsSnapshot) {
+            this.bullets = bulletsSnapshot.state;
+        }       
+
         this.camera.follow(this.player);
         this.camera.update();
         this.camera.following.scX = this.cwidth / 2;
@@ -155,8 +188,12 @@ module.exports = class Game {
 
         // draw
         this.camera.draw(this.ctx, this.map);
+        // this.ctx.fillStyle = 'blue';
+        // this.ctx.beginPath();
+        // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
+        // this.ctx.fill();
         this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
-        // this.render.drawPlayers(this.ctx, otherPlayers, bullets, this.camera, this.attackSound, this.dieSound);
+        this.render.drawPlayers(this.ctx, this.otherPlayers, this.bullets, this.camera, this.attackSound, this.dieSound);
     }
 
     start(playerName) {
