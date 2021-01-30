@@ -3,7 +3,7 @@ const geckos = require('@geckos.io/client').default;
 module.exports = class Network {
     start(name) {
         this.name = name;
-        this.channel = geckos({ port: 3000 });
+        this.channel = geckos({port: 443});
         
 
         this.connectPromise = new Promise((resolve, reject) => {
