@@ -9,6 +9,7 @@ const { validateName } = require('./util/validations');
 const Loader = require('./util/loader');
 const { SnapshotInterpolation, Vault } = require('@geckos.io/snapshot-interpolation');
 const Player = require('../server/models/player');
+const Bullet = require('../server/models/bullet');
 
 module.exports = class Game {
     constructor() {
@@ -19,7 +20,7 @@ module.exports = class Game {
         this.namePlayAgainTextField = document.getElementById('name-play-again');
         this.killsElement = document.getElementById('kills');
 
-        this.SI = new SnapshotInterpolation(60);
+        this.SI = new SnapshotInterpolation(15);
         this.playerVault = new Vault();
 
         this.lastUpdateTime = 0;
@@ -66,6 +67,7 @@ module.exports = class Game {
             this.network.channel.close();
         };
         this.player = new Player(null, 'b', 700, 600);
+        this.playerBullets = {};
         this.otherPlayers = [];
         this.bullets = [];
         this.render = new Render();
@@ -141,13 +143,19 @@ module.exports = class Game {
         this.network.channel.emit('ik', this.player.direction);
 
         // client prediction
+        Object.values(this.playerBullets).forEach(b => {
+            b.move(dt);
+        });
         this.player.move(dt);
         this.playerVault.add(this.SI.snapshot.create([{ id: this.network.channel.id, x: this.player.x, y: this.player.y }]));
 
         // reconciliation
         const serverSnapshot = this.SI.vault.get();
         // get the closest player snapshot that matches the server snapshot time
-        const playerSnapshot = this.playerVault.get(serverSnapshot.time, true)
+        let playerSnapshot = null;
+        if (serverSnapshot && serverSnapshot.time) {
+            playerSnapshot = this.playerVault.get(serverSnapshot.time, true)
+        }
         if (serverSnapshot && playerSnapshot) {
             // get the current player position on the server
             const serverPos = serverSnapshot.state.me[0];
@@ -155,13 +163,14 @@ module.exports = class Game {
             // calculate the offset between server and client
             const offsetX = playerSnapshot.state[0].x - serverPos.x
             const offsetY = playerSnapshot.state[0].y - serverPos.y    
+            console.log(offsetX)
             // this.me = { x: serverPos.x, y: serverPos.y };
             // check if the player is currently on the move
-            // const isMoving = this.player.direction.left || this.player.direction.up || this.player.direction.right || this.player.direction.down
+            const isMoving = this.player.direction.left || this.player.direction.up || this.player.direction.right || this.player.direction.down
 
             // we correct the position faster if the player moves
-            // const correction = isMoving ? 60 : 180
-            const correction = 40;
+            const correction = isMoving ? 40 : 20
+            // const correction = 40;
 
             // apply a step by step correction of the player's position
             this.player.x -= offsetX / correction
@@ -176,6 +185,22 @@ module.exports = class Game {
         const bulletsSnapshot = this.SI.calcInterpolation('x y', 'bullets');
         if (bulletsSnapshot) {
             this.bullets = bulletsSnapshot.state;
+            this.bullets.filter(b => b.ownerId == this.network.channel.id).map(b => {
+                
+                // if not exist yet
+                if (!this.playerBullets[b.id]) {
+                    // console.log(this.player.shotPos)
+                    // console.log(this.player.x, this.player.y)
+                    let offsetX = this.player.x - this.player.beforePos.x
+                    let offsetY = this.player.y - this.player.beforePos.y
+                    let angle = Math.atan2(this.player.shotPos.y - offsetY, this.player.shotPos.x - offsetX) + Math.PI / 2;
+                    let newBullet = new Bullet(this.player.x, this.player.y, 10, angle, this.network.channel.id, 28, 0, b.id);
+                    // newBullet.angle = angle;
+                    this.playerBullets[b.id] = newBullet;
+                }
+              
+            });
+            // this.bullets = this.bullets.filter(b => b.ownerId != this.network.channel.id);
         }       
 
         this.camera.follow(this.player);
@@ -193,7 +218,7 @@ module.exports = class Game {
         // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
         // this.ctx.fill();
         this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
-        this.render.drawPlayers(this.ctx, this.otherPlayers, this.bullets, this.camera, this.attackSound, this.dieSound);
+        this.render.drawPlayers(this.ctx, this.otherPlayers, [...Object.values(this.playerBullets), ...this.bullets], this.camera, this.attackSound, this.dieSound);
     }
 
     start(playerName) {

@@ -9,23 +9,28 @@ module.exports = class Network {
         this.connectPromise = new Promise((resolve, reject) => {
             this.channel.onConnect(error => {
                 if (error) {
+                    console.log('error');
                     console.error(error.message);
-                    reject();
+                    return;
+                } else {
+                    this.channel.emit('join', this.name);
+                    console.log(this.channel.id)
+                    resolve(this.channel.id);
                 }
-                this.channel.emit('join', this.name);
-                resolve(this.channel.id);
             });
         })
     }
 
-    connect(state, loopRef, render, updateLeaderBoard, gameCtx) {
-        this.connectPromise.then((socketId) => {
-            render.meId = socketId;
+    connect(state, loopRef, render, player, updateLeaderBoard, gameCtx) {
+        this.connectPromise.then((channelId) => {
+            render.meId = channelId;
+            player.id = channelId;
             render.playerName = localStorage.getItem('name');
             this.channel.on('update', (newUpdate) => {
                 state.handleUpdate(newUpdate)
             })
             this.channel.onDisconnect(() => {
+                console.log('disconnected')
                 clearInterval(loopRef);
             })
             this.channel.on('leaderboard', (leaderboard) => {

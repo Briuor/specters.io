@@ -19,6 +19,7 @@ class Game {
 
         this.leaderBoardDelay = 1000;
         this.lastLeaderBoardUpdate = Date.now();
+        this.tick = 0;
     }
 
     addPlayer(channel, name) {
@@ -62,6 +63,7 @@ class Game {
     }
 
     update() {
+        this.tick++;
         let now = Date.now();
         let dt = (now - this.lastUpdateTime) / 1000;
         this.lastUpdateTime = now;
@@ -133,30 +135,34 @@ class Game {
         }
 
         // send update event to each client
-        Object.keys(this.channels).forEach(channelId => {
-            const nearbyPlayers = Object.values(this.players).filter(
-                p => p !== this.players[channelId] && p.distanceTo(this.players[channelId]) <= (this.gameWidth+190) / 2,
-            );
-            const nearbyBullets = this.bullets.filter(
-                b => b.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
-            );
-            let me = this.players[channelId].serializeMe();
-            let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
-            let bullets = nearbyBullets.map(b => b.serialize());
-            // let players = [me]
-            // if (otherPlayers.length > 0) {
-            //     players = [me, ...otherPlayers];
-            // }
-            let worldState = {
-                me: [me],
-                otherPlayers,
-                bullets
-            };
+        if (this.tick % 4 === 0) {
 
-            const snapshot = this.SI.snapshot.create(worldState)
+            Object.keys(this.channels).forEach(channelId => {
+                const nearbyPlayers = Object.values(this.players).filter(
+                    p => p !== this.players[channelId] && p.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
+                );
+                const nearbyBullets = this.bullets.filter(
+                    b => b.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
+                );
+                let me = this.players[channelId].serializeMe();
+                let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
+                let bullets = nearbyBullets.map(b => b.serialize());
+                // let players = [me]
+                // if (otherPlayers.length > 0) {
+                //     players = [me, ...otherPlayers];
+                // }
+                let worldState = {
+                    me: [me],
+                    otherPlayers,
+                    bullets
+                };
 
-            this.channels[channelId].emit('update', snapshot);
-        });
+                const snapshot = this.SI.snapshot.create(worldState)
+
+                this.channels[channelId].emit('update', snapshot);
+
+            });
+        }
 
     }
 }

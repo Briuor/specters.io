@@ -1,8 +1,8 @@
 const { nanoid } = require('nanoid');
 
 class Bullet {
-    constructor(x, y, r, angle, ownerId, meRay, kills) {
-        this.id = nanoid();
+    constructor(x, y, r, angle, ownerId, meRay, kills, id=null) {
+        this.id = id ? id : nanoid();
         this.x = x + (meRay/2) * Math.cos(angle - Math.PI / 2);
         this.y = y + (meRay/2) * Math.sin(angle - Math.PI / 2);
         this.r = r + (kills*2);
@@ -13,7 +13,7 @@ class Bullet {
     }
 
     serialize() {
-        return { id: this.id, x: this.x, y: this.y, angle: this.angle, r: this.r };
+        return { id: this.id, x: this.x, y: this.y, angle: this.angle, r: this.r, ownerId: this.ownerId };
     }
 
     move(dt) {

@@ -175,7 +175,6 @@ module.exports = class Render {
         ctx.translate(p.x - camera.x, p.y - camera.y);
         ctx.rotate(Math.PI + p.angle);
         ctx.translate(-(p.x - camera.x), -(p.y - camera.y));
-        console.log(p.r)
         ctx.drawImage(this.projectileImage, 0, 0, this.bulletRay, this.bulletRay, p.x - p.r/2 - camera.x, p.y - p.r - camera.y, p.r, p.r);
         ctx.restore();
     }
