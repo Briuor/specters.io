@@ -32,7 +32,7 @@ module.exports = class Render {
         this.bulletRay = 10;
     }
 
-    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills, playerBullets) {
+    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills) {
         let sizeIncrease = kills * 4;
         // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
@@ -88,9 +88,6 @@ module.exports = class Render {
         }
         if (this.attackAnimation && this.currentFrame == totalFrames && totalFrames == 3) {
             this.attackAnimation = false;
-            let bullet = me.shoot(null);
-            if(bullet)
-                playerBullets.push(bullet);
         }
         
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay/2;

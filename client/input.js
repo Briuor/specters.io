@@ -3,7 +3,7 @@ module.exports = class Input {
         document.addEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, player));
         document.addEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, player));
         document.addEventListener('mousemove', (e) => this.handleMouseMove(e, network, camera, canvas, player), true);
-        document.addEventListener('click', (e) => this.handleMouseClick(e, network, canvas, camera, player, playerBullets), true);
+        document.addEventListener('click', () => this.handleMouseClick(network), true);
     }
 
     // stopListen(network, camera) {
@@ -23,16 +23,8 @@ module.exports = class Input {
         }
     }
 
-    handleMouseClick(e, network, canvas, camera, player, playerBullets) {
+    handleMouseClick(network) {
         network.channel.emit('imc');
-        // const x = e.clientX - canvas.getBoundingClientRect().left - camera.following.scX;
-        // const y = e.clientY - canvas.getBoundingClientRect().top - camera.following.scY;
-        // player.shotPos = { x, y };
-        // player.beforePos = { x: player.x, y: player.y }
-        let bullet = player.shoot(network.id);
-        if (bullet) {
-            playerBullets.push(bullet);
-        }
     }
 
     handleMouseMove(e, network, camera, canvas, player) {
