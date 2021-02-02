@@ -67,7 +67,7 @@ module.exports = class Game {
             this.network.channel.close();
         };
         this.player = new Player(null, 'b', 700, 600);
-        this.playerBullets = {};
+        this.playerBullets = [];
         this.otherPlayers = [];
         this.bullets = [];
         this.render = new Render();
@@ -143,7 +143,7 @@ module.exports = class Game {
         this.network.channel.emit('ik', this.player.direction);
 
         // client prediction
-        Object.values(this.playerBullets).forEach(b => {
+        this.playerBullets.forEach(b => {
             b.move(dt);
         });
         this.player.move(dt);
@@ -188,16 +188,16 @@ module.exports = class Game {
             this.bullets.filter(b => b.ownerId == this.network.channel.id).map(b => {
                 
                 // if not exist yet
-                if (!this.playerBullets[b.id]) {
-                    // console.log(this.player.shotPos)
-                    // console.log(this.player.x, this.player.y)
-                    let offsetX = this.player.x - this.player.beforePos.x
-                    let offsetY = this.player.y - this.player.beforePos.y
-                    let angle = Math.atan2(this.player.shotPos.y - offsetY, this.player.shotPos.x - offsetX) + Math.PI / 2;
-                    let newBullet = new Bullet(this.player.x, this.player.y, 10, angle, this.network.channel.id, 28, 0, b.id);
-                    // newBullet.angle = angle;
-                    this.playerBullets[b.id] = newBullet;
-                }
+                // if (!this.playerBullets[b.id]) {
+                //     // console.log(this.player.shotPos)
+                //     // console.log(this.player.x, this.player.y)
+                //     let offsetX = this.player.x - this.player.beforePos.x
+                //     let offsetY = this.player.y - this.player.beforePos.y
+                //     let angle = Math.atan2(this.player.shotPos.y - offsetY, this.player.shotPos.x - offsetX) + Math.PI / 2;
+                //     let newBullet = new Bullet(this.player.x, this.player.y, 10, angle, this.network.channel.id, 28, 0, b.id);
+                //     // newBullet.angle = angle;
+                //     this.playerBullets[b.id] = newBullet;
+                // }
               
             });
             // this.bullets = this.bullets.filter(b => b.ownerId != this.network.channel.id);
@@ -217,15 +217,15 @@ module.exports = class Game {
         // this.ctx.beginPath();
         // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
         // this.ctx.fill();
-        this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
-        this.render.drawPlayers(this.ctx, this.otherPlayers, [...Object.values(this.playerBullets), ...this.bullets], this.camera, this.attackSound, this.dieSound);
+        this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills, this.playerBullets);
+        this.render.drawPlayers(this.ctx, this.otherPlayers, [...this.playerBullets, ...this.bullets], this.camera, this.attackSound, this.dieSound);
     }
 
     start(playerName) {
         this.canvas.style.display = 'block';
         this.network.start(playerName);
 
-        this.input.listen(this.network, this.camera, this.canvas, this.player);
+        this.input.listen(this.network, this.camera, this.canvas, this.player, this.playerBullets);
         Promise.all([
             this.loader.loadImage('ghost', 'images/ghost.png'),
             this.loader.loadImage('tileset', 'images/tileset.png'),

@@ -1,9 +1,9 @@
 module.exports = class Input {
-    listen(network, camera, canvas, player) {
+    listen(network, camera, canvas, player, playerBullets) {
         document.addEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, player));
         document.addEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, player));
         document.addEventListener('mousemove', (e) => this.handleMouseMove(e, network, camera, canvas, player), true);
-        document.addEventListener('click', (e) => this.handleMouseClick(e,network, canvas, camera, player), true);
+        document.addEventListener('click', (e) => this.handleMouseClick(e, network, canvas, camera, player, playerBullets), true);
     }
 
     // stopListen(network, camera) {
@@ -23,12 +23,16 @@ module.exports = class Input {
         }
     }
 
-    handleMouseClick(e, network, canvas, camera, player) {
+    handleMouseClick(e, network, canvas, camera, player, playerBullets) {
         network.channel.emit('imc');
-        const x = e.clientX - canvas.getBoundingClientRect().left - camera.following.scX;
-        const y = e.clientY - canvas.getBoundingClientRect().top - camera.following.scY;
-        player.shotPos = { x, y };
-        player.beforePos = { x: player.x, y: player.y }
+        // const x = e.clientX - canvas.getBoundingClientRect().left - camera.following.scX;
+        // const y = e.clientY - canvas.getBoundingClientRect().top - camera.following.scY;
+        // player.shotPos = { x, y };
+        // player.beforePos = { x: player.x, y: player.y }
+        let bullet = player.shoot(network.id);
+        if (bullet) {
+            playerBullets.push(bullet);
+        }
     }
 
     handleMouseMove(e, network, camera, canvas, player) {

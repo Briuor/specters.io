@@ -1,3 +1,4 @@
+const Bullet = require('../server/models/bullet');
 const PixelCanvas = require('./pixelCanvas');
 
 module.exports = class Render {
@@ -31,7 +32,7 @@ module.exports = class Render {
         this.bulletRay = 10;
     }
 
-    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills) {
+    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills, playerBullets) {
         let sizeIncrease = kills * 4;
         // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
@@ -87,6 +88,9 @@ module.exports = class Render {
         }
         if (this.attackAnimation && this.currentFrame == totalFrames && totalFrames == 3) {
             this.attackAnimation = false;
+            let bullet = me.shoot(null);
+            if(bullet)
+                playerBullets.push(bullet);
         }
         
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay/2;
