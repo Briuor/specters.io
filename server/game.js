@@ -135,7 +135,7 @@ class Game {
         }
 
         // send update event to each client
-        if (this.tick % 4 === 0) {
+        // if (this.tick % 4 === 0) {
 
             Object.keys(this.channels).forEach(channelId => {
                 const nearbyPlayers = Object.values(this.players).filter(
@@ -162,7 +162,7 @@ class Game {
                 this.channels[channelId].emit('update', snapshot);
 
             });
-        }
+        // }
 
     }
 }

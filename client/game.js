@@ -20,7 +20,7 @@ module.exports = class Game {
         this.namePlayAgainTextField = document.getElementById('name-play-again');
         this.killsElement = document.getElementById('kills');
 
-        this.SI = new SnapshotInterpolation(15);
+        this.SI = new SnapshotInterpolation(60);
         this.playerVault = new Vault();
 
         this.lastUpdateTime = 0;
@@ -218,7 +218,7 @@ module.exports = class Game {
         // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
         // this.ctx.fill();
         this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills, this.playerBullets);
-        this.render.drawPlayers(this.ctx, this.otherPlayers, [...this.playerBullets, ...this.bullets], this.camera, this.attackSound, this.dieSound);
+        this.render.drawPlayers(this.ctx, this.otherPlayers, [...this.bullets], this.camera, this.attackSound, this.dieSound);
     }
 
     start(playerName) {
