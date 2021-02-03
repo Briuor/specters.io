@@ -1,7 +1,7 @@
 const geckos = require('@geckos.io/client').default;
 
 module.exports = class Network {
-    start(name) {
+    start(name, player) {
         this.name = name;
         this.channel = geckos({ port: 3000 });
         
@@ -14,7 +14,7 @@ module.exports = class Network {
                     return;
                 } else {
                     this.channel.emit('join', this.name);
-                    console.log(this.channel.id)
+                    player.id = this.channel.id;
                     resolve(this.channel.id);
                 }
             });
@@ -24,7 +24,6 @@ module.exports = class Network {
     connect(state, loopRef, render, player, updateLeaderBoard, gameCtx) {
         this.connectPromise.then((channelId) => {
             render.meId = channelId;
-            player.id = channelId;
             render.playerName = localStorage.getItem('name');
             this.channel.on('update', (newUpdate) => {
                 state.handleUpdate(newUpdate)

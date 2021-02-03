@@ -125,7 +125,9 @@ module.exports = class Game {
     }
 
     gameOver() {
-        this.network.channel.close();
+        if (this.network.channel && this.network.channel.id) {
+            this.network.channel.close();
+        }
         clearInterval(this.loopRef);
         this.playAgainModal.style.display = "block";
         this.killsElement.innerText = this.kills + " Kills";
@@ -134,76 +136,77 @@ module.exports = class Game {
 
     // Main Loop
     run() {
-        let now = Date.now();
-        let dt = (now - this.lastUpdateTime) / 1000;
-        this.lastUpdateTime = now;
+        if (this.network.channel.id) {
+            let now = Date.now();
+            let dt = (now - this.lastUpdateTime) / 1000;
+            this.lastUpdateTime = now;
 
-        // send move to server
-        this.network.channel.emit('ik', this.player.direction);
+            // send move to server
+            this.network.channel.emit('ik', this.player.direction);
 
-        // client prediction
-        this.player.move(dt);
-        this.playerVault.add(this.SI.snapshot.create([{ id: this.network.channel.id, x: this.player.x, y: this.player.y }]));
+            // client prediction
+            this.player.move(dt);
+            this.playerVault.add(this.SI.snapshot.create([{ id: this.network.channel.id, x: this.player.x, y: this.player.y }]));
 
-        // reconciliation
-        const serverSnapshot = this.SI.vault.get();
-        // get the closest player snapshot that matches the server snapshot time
-        let playerSnapshot = null;
-        if (serverSnapshot && serverSnapshot.time) {
-            playerSnapshot = this.playerVault.get(serverSnapshot.time, true)
+            // reconciliation
+            const serverSnapshot = this.SI.vault.get();
+            // get the closest player snapshot that matches the server snapshot time
+            let playerSnapshot = null;
+            if (serverSnapshot && serverSnapshot.time) {
+                playerSnapshot = this.playerVault.get(serverSnapshot.time, true)
+            }
+            if (serverSnapshot && playerSnapshot) {
+                // get the current player position on the server
+                const serverPos = serverSnapshot.state.me[0];
+
+                // calculate the offset between server and client
+                const offsetX = playerSnapshot.state[0].x - serverPos.x
+                const offsetY = playerSnapshot.state[0].y - serverPos.y
+                // this.me = { x: serverPos.x, y: serverPos.y };
+                // check if the player is currently on the move
+                const isMoving = this.player.direction.left || this.player.direction.up || this.player.direction.right || this.player.direction.down
+
+                // we correct the position faster if the player moves
+                const correction = isMoving ? 40 : 80
+                // const correction = 40;
+
+                // apply a step by step correction of the player's position
+                this.player.x -= offsetX / correction
+                this.player.y -= offsetY / correction
+            }
+
+            // interpolation
+            const otherPlayersSnapshot = this.SI.calcInterpolation('x y', 'otherPlayers');
+            if (otherPlayersSnapshot) {
+                this.otherPlayers = otherPlayersSnapshot.state;
+            }
+            const bulletsSnapshot = this.SI.calcInterpolation('x y', 'bullets');
+            if (bulletsSnapshot) {
+                this.bullets = bulletsSnapshot.state;
+            }
+
+            this.camera.follow(this.player);
+            this.camera.update();
+            this.camera.following.scX = this.cwidth / 2;
+            this.camera.following.scY = this.cheight / 2;
+
+            // clear screen
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // draw
+            this.camera.draw(this.ctx, this.map);
+            // this.ctx.fillStyle = 'blue';
+            // this.ctx.beginPath();
+            // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
+            // this.ctx.fill();
+            this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
+            this.render.drawPlayers(this.ctx, this.otherPlayers, this.bullets, this.camera, this.attackSound, this.dieSound);
         }
-        if (serverSnapshot && playerSnapshot) {
-            // get the current player position on the server
-            const serverPos = serverSnapshot.state.me[0];
-
-            // calculate the offset between server and client
-            const offsetX = playerSnapshot.state[0].x - serverPos.x
-            const offsetY = playerSnapshot.state[0].y - serverPos.y
-            console.log(offsetX)
-            // this.me = { x: serverPos.x, y: serverPos.y };
-            // check if the player is currently on the move
-            const isMoving = this.player.direction.left || this.player.direction.up || this.player.direction.right || this.player.direction.down
-
-            // we correct the position faster if the player moves
-            const correction = isMoving ? 40 : 20
-            // const correction = 40;
-
-            // apply a step by step correction of the player's position
-            this.player.x -= offsetX / correction
-            this.player.y -= offsetY / correction
-        }
-
-        // interpolation
-        const otherPlayersSnapshot = this.SI.calcInterpolation('x y', 'otherPlayers');
-        if (otherPlayersSnapshot) {
-            this.otherPlayers = otherPlayersSnapshot.state;
-        }
-        const bulletsSnapshot = this.SI.calcInterpolation('x y', 'bullets');
-        if (bulletsSnapshot) {
-            this.bullets = bulletsSnapshot.state;
-        }
-
-        this.camera.follow(this.player);
-        this.camera.update();
-        this.camera.following.scX = this.cwidth / 2;
-        this.camera.following.scY = this.cheight / 2;
-
-        // clear screen
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // draw
-        this.camera.draw(this.ctx, this.map);
-        // this.ctx.fillStyle = 'blue';
-        // this.ctx.beginPath();
-        // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
-        // this.ctx.fill();
-        this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
-        this.render.drawPlayers(this.ctx, this.otherPlayers, this.bullets, this.camera, this.attackSound, this.dieSound);
     }
 
     start(playerName) {
         this.canvas.style.display = 'block';
-        this.network.start(playerName);
+        this.network.start(playerName, this.player);
 
         this.input.listen(this.network, this.camera, this.canvas, this.player);
         Promise.all([

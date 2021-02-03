@@ -1,10 +1,11 @@
 const path = require('path');
 const geckos = require('@geckos.io/server').default
+const { iceServers } = require('@geckos.io/server');
 const http = require('http')
 const express = require('express')
 const app = express()
 const server = http.createServer(app)
-const io = geckos()
+const io = geckos({ iceServers })
 const cors = require('cors');
 const Game = require('./game');
 
