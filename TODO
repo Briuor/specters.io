@@ -1,8 +1,21 @@
-- Do right connection
-- Handle Disconnect
-- Loading Page
-- Fix time undefined
+Test- Do right connection
+Test- Handle Disconnect
+OK - Loading Page
+Test- Fix time undefined
+OK- Not use time on die
+OK- Colocar meId e kills no this.player client side
+OK- Retirar Incremento na speed
+OK- Fix correction in prediction when impulse true
+OK- Fix openning several connect when click play again[ bug ]
+OK- player move 70
+OK- Adjust Leaderboard
+OK- Fix DIE
+- Buffer Data
+- Receber dados de spawn
+- ping client side
+- Cooldown bar
+- How to play
 
-
+- Test slow projectile
 - Fix sprite when increase size
 - Improve Art

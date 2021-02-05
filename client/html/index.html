@@ -7,7 +7,7 @@
     <meta name="language" content="en" />
     <meta name="keywords" content="specters.io,specters,ghost.io,ghost,ghosts,io,io game,ghost game,specter game,multiplayer">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="description" content="Specters.io is an io game where you are a ghost or specter and battle against others of ghosts/specters." />
+    <meta name="description" content="Specters.io is an io game where you are a ghost or specter and battle against others ghosts/specters." />
     <link rel="stylesheet" href="index.css" type="text/css" />
     <title>Specters.io - io game</title>
 </head>
@@ -28,13 +28,18 @@
     <div class="game-name center">
         <img src="/images/gamename.png" />
     </div>
+    <!-- PLAY -->
     <form id="play-form">
         <label for="name-play">Ghost Name</label>
-        <input name="name" class="name" id="name-play" type="text" pattern="[A-Za-z].{1,8}" title="a-z and less than 8 characters." placeholder="Unammed" />
+        <input name="name" class="name" id="name-play" type="text" pattern="[A-Za-z].{0,7}" title="a-z and less than 8 characters." placeholder="Unammed" />
         <div class="play-btn">
             <button id="play" type="submit">Play</button>
         </div>
     </form>
+
+    <div id="loading">
+        <h1>Loading...</h1>
+    </div>
 
     <!-- PLAY AGAIN -->
     <div id="play-again-modal">
@@ -43,8 +48,6 @@
         </div>
         <form id="play-again-form">
             <p id="kills"></p>
-            <label for="name-play-again">Ghost Name </label>
-            <input name="name" class="name" id="name-play-again" type="text" pattern="[A-Za-z].{0,8}" title="a-z and less than 8 characters." placeholder="Unammed" />
             <div class="play-btn">
                 <button id="play" type="submit">Play Again</button>
             </div>

@@ -9,16 +9,30 @@ const { validateName } = require('./util/validations');
 const Loader = require('./util/loader');
 const { SnapshotInterpolation, Vault } = require('@geckos.io/snapshot-interpolation');
 const Player = require('../server/models/player');
-const Bullet = require('../server/models/bullet');
 
 module.exports = class Game {
     constructor() {
+        this.playForm = document.getElementById('play-form');
+        this.body = document.getElementsByTagName('body')[0];
+        this.gameName = document.getElementsByClassName('game-name')[0];
+        this.name = document.getElementById('name-play');
+        this.name.addEventListener("input", (e) => {
+            e.target.value = e.target.value.replace(new RegExp(/[0-9]{0,7}$/,'ig'), '');
+        });
+        this.name.focus();
+        this.playForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.playForm.style.display = 'none';
+            this.gameName.style.display = 'none';
+            this.player.name = validateName(this.name.value);
+            this.start(this.player.name);
+        });
         this.leaderBoardWrapper = document.getElementById('leaderboard-wrapper');
         this.leaderBoard = document.getElementById('leaderboard');
         this.playAgainModal = document.getElementById('play-again-modal');
         this.playAgainForm = document.getElementById('play-again-form');
-        this.namePlayAgainTextField = document.getElementById('name-play-again');
         this.killsElement = document.getElementById('kills');
+        this.loadingDiv = document.getElementById('loading');
 
         this.SI = new SnapshotInterpolation(60);
         this.playerVault = new Vault();
@@ -27,17 +41,13 @@ module.exports = class Game {
 
         this.playAgainForm.addEventListener("submit", (e) => {
             e.preventDefault();
-            this.playAgainModal.style.display = 'none';
-            this.init();
-            this.start(validateName(this.namePlayAgainTextField.value));
+            window.location.reload();
         })
         this.canvas = document.getElementById('canvas');
         this.canvas.style.background = "black";
         this.ctx = this.canvas.getContext('2d');
 
         this.loader = new Loader();
-
-        this.kills = 0;
 
         this.gameWidth = 640;
         this.gameHeight = 360;
@@ -64,9 +74,11 @@ module.exports = class Game {
         this.state = new State(this.SI);
         this.network = new Network();
         window.onbeforeunload = () => {
-            this.network.channel.close();
+            if (this.network.channel && this.network.channel.id) {
+                this.network.channel.close();
+            }
         };
-        this.player = new Player(null, 'b', 700, 600);
+        this.player = new Player(null, '', 700, 600);
         this.otherPlayers = [];
         this.bullets = [];
         this.render = new Render();
@@ -104,21 +116,33 @@ module.exports = class Game {
 
     updateLeaderBoard(leaderBoard, context) {
         let liList = context.leaderBoard.children;
-        for (let i = 0; i < liList.length; i++) {
+        let len = liList.length
+        liList[len - 1].children[0].style.display = 'none';
+        liList[len - 1].children[1].style.display = 'none';
+
+        // fill top 5 players
+        for (let i = 0; i < len; i++) {
             let player = leaderBoard[i];
             let nameEl = liList[i].children[0];
-            let scoreEl = liList[i].children[1];
+            let killsEl = liList[i].children[1];
             let highlight = '';
             if (player) {
-                if (player.id == context.render.meId) {
+                if (player.id == context.player.id) {
                     highlight = '>';
+                    if (i == len - 1) {
+                        liList[len - 1].children[0].style.display = 'inline-block';
+                        liList[len - 1].children[1].style.display = 'inline-block';
+                        nameEl.innerText = highlight + '?.' + player.name;
+                        killsEl.innerText = player.kills;
+                        break;
+                    }
                 }
-                nameEl.innerText = highlight + (i == 5 ? '?.-' : (i + 1) + '.' + player.name);
-                scoreEl.innerText = player.score;
+                nameEl.innerText = highlight + (i + 1) + '.' + player.name;
+                killsEl.innerText = player.kills;
             }
             else {
-                nameEl.innerText = highlight + (i == 5 ? '?.-' : (i + 1) + '.-');
-                scoreEl.innerText = '-';
+                nameEl.innerText = highlight + (i + 1) + '.-';
+                killsEl.innerText = '-';
             }
         }
         context.leaderBoardWrapper.style.marginRight = context.canvas.getBoundingClientRect().left;
@@ -130,8 +154,7 @@ module.exports = class Game {
         }
         clearInterval(this.loopRef);
         this.playAgainModal.style.display = "block";
-        this.killsElement.innerText = this.kills + " Kills";
-        this.namePlayAgainTextField.value = localStorage.getItem('name') ? localStorage.getItem('name') : 'unnamed';
+        this.killsElement.innerText = this.player.kills + " Kill" + (this.player.kills == 1 ? "s" : "");
     }
 
     // Main Loop
@@ -145,7 +168,7 @@ module.exports = class Game {
             this.network.channel.emit('ik', this.player.direction);
 
             // client prediction
-            this.player.move(dt);
+            this.player.move(dt, true);
             this.playerVault.add(this.SI.snapshot.create([{ id: this.network.channel.id, x: this.player.x, y: this.player.y }]));
 
             // reconciliation
@@ -158,17 +181,15 @@ module.exports = class Game {
             if (serverSnapshot && playerSnapshot) {
                 // get the current player position on the server
                 const serverPos = serverSnapshot.state.me[0];
+                this.player.kills = serverPos.kills;
+                this.player.impulsed = serverPos.impulsed;
 
                 // calculate the offset between server and client
                 const offsetX = playerSnapshot.state[0].x - serverPos.x
                 const offsetY = playerSnapshot.state[0].y - serverPos.y
-                // this.me = { x: serverPos.x, y: serverPos.y };
-                // check if the player is currently on the move
-                const isMoving = this.player.direction.left || this.player.direction.up || this.player.direction.right || this.player.direction.down
 
                 // we correct the position faster if the player moves
-                const correction = isMoving ? 40 : 80
-                // const correction = 40;
+                const correction = this.player.impulsed ? 10 : 40;
 
                 // apply a step by step correction of the player's position
                 this.player.x -= offsetX / correction
@@ -195,33 +216,35 @@ module.exports = class Game {
 
             // draw
             this.camera.draw(this.ctx, this.map);
-            // this.ctx.fillStyle = 'blue';
-            // this.ctx.beginPath();
-            // this.ctx.arc(this.me.x - this.camera.x, this.me.y - this.camera.y, 28 / 2, 0, 2 * Math.PI);
-            // this.ctx.fill();
-            this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound, this.kills);
+
+            this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound);
             this.render.drawPlayers(this.ctx, this.otherPlayers, this.bullets, this.camera, this.attackSound, this.dieSound);
         }
     }
 
     start(playerName) {
-        this.canvas.style.display = 'block';
+        this.loadingDiv.style.display = 'block';
         this.network.start(playerName, this.player);
 
-        this.input.listen(this.network, this.camera, this.canvas, this.player);
-        Promise.all([
-            this.loader.loadImage('ghost', 'images/ghost.png'),
-            this.loader.loadImage('tileset', 'images/tileset.png'),
-            this.loader.loadImage('projectile', 'images/projectile.png'),
-            this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this)
-        ]).then(() => {
-
-            this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
-            this.render.playerImage = this.loader.getImage('ghost');
-            this.camera.tilesetImage = this.loader.getImage('tileset');
-            this.render.projectileImage = this.loader.getImage('projectile');
-            this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
-            this.leaderBoardWrapper.style.display = 'block';
-        });
+        setTimeout(() => {
+            Promise.all([
+                this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this),
+                this.loader.loadImage('ghost', 'images/ghost.png'),
+                this.loader.loadImage('tileset', 'images/tileset.png'),
+                this.loader.loadImage('projectile', 'images/projectile.png'),
+            ]).then(() => {
+                this.input.listen(this.network, this.camera, this.canvas, this.player);
+                this.body.style.background = '#000';
+                this.body.style.cursor = 'crosshair';
+                this.loadingDiv.style.display = 'none';
+                this.canvas.style.display = 'block';
+                this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
+                this.render.playerImage = this.loader.getImage('ghost');
+                this.camera.tilesetImage = this.loader.getImage('tileset');
+                this.render.projectileImage = this.loader.getImage('projectile');
+                this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
+                this.leaderBoardWrapper.style.display = 'block';
+            })
+        }, 500);
     }
 }

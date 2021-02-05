@@ -5,13 +5,6 @@ module.exports = class Input {
         document.addEventListener('mousemove', (e) => this.handleMouseMove(e, network, camera, canvas, player), true);
         document.addEventListener('click', () => this.handleMouseClick(network), true);
     }
-
-    // stopListen(network, camera) {
-    //     document.removeEventListener('keydown', (e) => this.handleKeyBoardInput(e, true, network));
-    //     document.removeEventListener('keyup', (e) => this.handleKeyBoardInput(e, false, network));
-    //     document.removeEventListener('mousemove', (e) => this.handleMouseMove(e, network, camera));
-    //     document.removeEventListener('click', () => this.handleMouseClick(network));
-    // }
     
     isDirection(code) {
         return (code == 68 || code == 39 || code == 83 || code == 40 || code == 65 || code == 37 || code == 87 || code == 38)

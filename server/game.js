@@ -31,7 +31,7 @@ class Game {
 
     removePlayer(channel) {
         if (this.channels[channel.id]) {
-            this.channels[channel.id].close();
+            // this.channels[channel.id].close();
             delete this.channels[channel.id];
             delete this.players[channel.id];
         }
@@ -76,7 +76,7 @@ class Game {
             else if (this.players[playerId] && !this.players[playerId].die) {
                 this.players[playerId].move(dt);
                 // check if died
-                if (this.map.isPositionLava(this.players[playerId], this.players[playerId].kills)) {
+                if (this.map.isPositionLava(this.players[playerId])) {
                     if (this.channels[playerId]) {
                         let playerScoreId = this.players[playerId].hittedById;
                         // if was hitted
@@ -130,7 +130,7 @@ class Game {
                     if (a && b) {
                         return a.kills - b.kills;
                     }
-                }).map(p => p.leaderBoardSerialize()).splice(0, 5);
+                }).map(p => p.leaderBoardSerialize()).splice(0, 5).reverse();
             this.io.emit('leaderboard', leaderBoard);
         }
 

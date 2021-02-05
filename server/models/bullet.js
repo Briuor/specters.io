@@ -6,7 +6,7 @@ class Bullet {
         this.x = x + (meRay/2) * Math.cos(angle - Math.PI / 2);
         this.y = y + (meRay/2) * Math.sin(angle - Math.PI / 2);
         this.r = r + (kills*2);
-        this.speed = 300;
+        this.speed = 250;
         this.angle = angle;
         this.ownerId = ownerId;
         this.color = "yellow";

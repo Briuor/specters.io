@@ -1,4 +1,3 @@
-const Bullet = require('../server/models/bullet');
 const PixelCanvas = require('./pixelCanvas');
 
 module.exports = class Render {
@@ -8,7 +7,6 @@ module.exports = class Render {
         this.attackList = [];
         this.dieList = [];
         // me
-        this.meId = '';
         this.playerName = 'Unammed';
         this.playerImage = null;
         this.currentFrame = 0;
@@ -32,29 +30,29 @@ module.exports = class Render {
         this.bulletRay = 10;
     }
 
-    drawPlayer(ctx, me, gameOver, attackSound, dieSound, kills) {
-        let sizeIncrease = kills * 4;
+    drawPlayer(ctx, me, gameOver, attackSound, dieSound) {
+        let sizeIncrease = me.kills * 4;
         // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
         // ctx.arc(me.screenX, me.screenY, this.meRay/2 + sizeIncrease/2, 0, 2 * Math.PI);
         // ctx.fill();
 
         let col;
-        let angle = (180 * me.angle) / Math.PI; 
+        let angle = (180 * me.angle) / Math.PI;
         if (angle < 0) angle = 360 + angle;
 
-        if (this.attackList.length > 0 && this.attackList.includes(this.meId)) {
+        if (this.attackList.length > 0 && this.attackList.includes(me.id)) {
             this.currentFrame = 0;
             this.attackAnimation = true;
-            this.attackList.splice(this.attackList.findIndex(id => this.meId == id), 1);
+            this.attackList.splice(this.attackList.findIndex(id => me.id == id), 1);
             attackSound.play();
         }
 
-        if (this.dieList.length > 0 && this.dieList.includes(this.meId)) {
+        if (this.dieList.length > 0 && this.dieList.includes(me.id)) {
             this.attackAnimation = false;
             this.currentFrame = 0;
             this.dieAnimation = true;
-            this.dieList.splice(this.dieList.findIndex(id => this.meId == id), 1);
+            this.dieList.splice(this.dieList.findIndex(id => me.id == id), 1);
             dieSound.play();
         }
         else {
@@ -92,15 +90,15 @@ module.exports = class Render {
         
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay/2;
         ctx.drawImage(this.playerImage, this.currentFrame * (this.meRay), col * 26, this.meRay, 26, me.screenX - playerSizeIncrease, me.screenY - playerSizeIncrease, (this.meRay) + sizeIncrease, 26 + sizeIncrease);
-        this.pixelCanvas.drawName(ctx, this.playerName, 1, Math.floor(me.screenX - (this.playerName.length * 2)), Math.floor(me.screenY - playerSizeIncrease - 7));
+        this.pixelCanvas.drawName(ctx, me.name, 1, Math.floor(me.screenX - (me.name.length * 2)), Math.floor(me.screenY - playerSizeIncrease - 7));
     }
 
     drawPlayers(ctx, otherPlayers, bullets, camera, attackSound, dieSound) {
-        otherPlayers.forEach((p, index) => this.drawOther(ctx, p, camera, p.id, attackSound, dieSound));
+        otherPlayers.forEach((p, index) => this.drawOther(ctx, p, camera, attackSound, dieSound));
         bullets.forEach(b => this.drawBullet(ctx, b, camera));
     }
 
-    drawOther(ctx, p, camera, index, attackSound, dieSound) {
+    drawOther(ctx, p, camera, attackSound, dieSound) {
         let sizeIncrease = p.kills * 4;
 
         // ctx.fillStyle = p.color;
@@ -108,61 +106,61 @@ module.exports = class Render {
         // ctx.arc(p.x - camera.x, p.y - camera.y, p.r, 0, 2 * Math.PI);
         // ctx.fill();
 
-        if (this.oanimationTime[index] == null ) {
-            this.oanimationTime[index] = 0;
+        if (this.oanimationTime[p.id] == null ) {
+            this.oanimationTime[p.id] = 0;
         }
-        if (this.ocurrentFrame[index] == null) {
-            this.ocurrentFrame[index] = 0;
+        if (this.ocurrentFrame[p.id] == null) {
+            this.ocurrentFrame[p.id] = 0;
         }
 
         let angle = (180 * p.angle) / Math.PI;
         if (angle < 0) angle = 360 + angle;
 
         if (this.attackList.length > 0 && this.attackList.includes(p.id)) {
-            this.ocurrentFrame[index] = 0;
-            this.oattackAnimation[index] = true;
+            this.ocurrentFrame[p.id] = 0;
+            this.oattackAnimation[p.id] = true;
             this.attackList.splice(this.attackList.findIndex(id => p.id == id), 1);
             attackSound.play();
         }
         if (this.dieList.length > 0 && this.dieList.includes(p.id)) {
-            this.oattackAnimation[index] = false;
-            this.ocurrentFrame[index] = 0;
-            this.odieAnimation[index] = true;
+            this.oattackAnimation[p.id] = false;
+            this.ocurrentFrame[p.id] = 0;
+            this.odieAnimation[p.id] = true;
             this.dieList.splice(this.dieList.findIndex(id => p.id == id), 1);
             dieSound.play();
         }
         let col;
         if (angle >= 45 && angle < 135) { //right
-            col = this.oattackAnimation[index] ? 5 : 1;
+            col = this.oattackAnimation[p.id] ? 5 : 1;
         }
         else if (angle >= 135 && angle < 225) { // down
-            col = this.oattackAnimation[index] ? 6 : 2;
+            col = this.oattackAnimation[p.id] ? 6 : 2;
         }
         else if (angle >= 225 && angle < 315) { // left
-            col = this.oattackAnimation[index] ? 4 : 0;
+            col = this.oattackAnimation[p.id] ? 4 : 0;
         }
         else { // top
-            col = this.oattackAnimation[index] ? 7 : 3;
+            col = this.oattackAnimation[p.id] ? 7 : 3;
         }
 
-        if (this.odieAnimation[index]) col = 8;
-        let totalFrames = this.oattackAnimation[index] ? 3 : 5;
-        if (this.odieAnimation[index]) {
+        if (this.odieAnimation[p.id]) col = 8;
+        let totalFrames = this.oattackAnimation[p.id] ? 3 : 5;
+        if (this.odieAnimation[p.id]) {
             totalFrames = 5;
         }
-        if (Date.now() - this.oanimationDuration >= this.oanimationTime[index]) {
-            this.ocurrentFrame[index] = this.ocurrentFrame[index] >= totalFrames ? 0 : this.ocurrentFrame[index] + 1;
-            this.oanimationTime[index] = Date.now();
+        if (Date.now() - this.oanimationDuration >= this.oanimationTime[p.id]) {
+            this.ocurrentFrame[p.id] = this.ocurrentFrame[p.id] >= totalFrames ? 0 : this.ocurrentFrame[p.id] + 1;
+            this.oanimationTime[p.id] = Date.now();
         }
-        if (this.dieAnimation[index] && this.currentFrame[index] == totalFrames && totalFrames == 5) {
-            this.dieAnimation[index] = false;
+        if (this.dieAnimation[p.id] && this.currentFrame[p.id] == totalFrames && totalFrames == 5) {
+            this.dieAnimation[p.id] = false;
         }
-        if (this.oattackAnimation[index] && this.ocurrentFrame[index] == 3 && totalFrames == 3) {
-            this.oattackAnimation[index] = false;
+        if (this.oattackAnimation[p.id] && this.ocurrentFrame[p.id] == 3 && totalFrames == 3) {
+            this.oattackAnimation[p.id] = false;
         }
 
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay / 2;
-        ctx.drawImage(this.playerImage, this.ocurrentFrame[index] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay + sizeIncrease, 26 + sizeIncrease);
+        ctx.drawImage(this.playerImage, this.ocurrentFrame[p.id] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay + sizeIncrease, 26 + sizeIncrease);
         this.pixelCanvas.drawName(ctx, p.name, 1, Math.floor(p.x - camera.x - (p.name.length * 2)), Math.floor(p.y - this.meRay - camera.y + 7));
     }
 

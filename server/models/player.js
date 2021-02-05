@@ -9,7 +9,7 @@ class Player {
         this.r = 28 + this.kills * 4; // 28 initial ray;
         this.name = name;
         this.direction = { right: false, left: false, up: false, down: false };
-        this.speed = 100;
+        this.speed = 70;
         this.color = '#fff';
         this.angle = 0;
         this.impulsed = false;
@@ -25,7 +25,7 @@ class Player {
         this.dieTime = 0;
     }
     serializeMe() {
-        return { id: this.id, x:this.x, y:this.y, angle:this.angle, kills: this.kills };
+        return { id: this.id, x: this.x, y: this.y, angle: this.angle, kills: this.kills, impulsed: this.impulsed, impulseAngle: this.impulseAngle };
     }
 
     serialize() {
@@ -36,9 +36,9 @@ class Player {
         return { id: this.id, name: this.name, kills: this.kills };
     }
 
-    move(dt) {
+    move(dt, clientside=false) {
         const MAP_SIZE = 57 * 50;
-        if (this.impulseVel > 0 && this.impulsed) {
+        if (clientside == false && this.impulseVel > 0 && this.impulsed) {
             this.impulseVel -= this.impulseSpeed;
             this.x += this.impulseVel * Math.cos(this.impulseAngle - Math.PI / 2) * dt;
             this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2) * dt;
@@ -63,6 +63,7 @@ class Player {
 
     impulse(player, bullet) {
         this.impulseAngle = Math.atan2(bullet.y - player.y, bullet.x - player.x) + Math.PI / 2;
+        // this.impulsed = true;
         this.prepareImpulse();
     }
 
@@ -91,7 +92,6 @@ class Player {
         this.kills++;
         this.r = 28 + this.kills * 4; // 28 initial ray
         this.impulseSpeed += this.impulseSpeed <= 20 ? 1 : 0;
-        this.speed += this.speed <= 300 ? 10 : 0;
     }
 
     updateDirection({ keyCode, value, direction = null }) {

@@ -1,30 +1,29 @@
 const geckos = require('@geckos.io/client').default;
+const {iceServers} = require('@geckos.io/client');
 
 module.exports = class Network {
     start(name, player) {
         this.name = name;
-        this.channel = geckos({ port: 3000 });
+        this.channel = geckos({ port: 3000, iceServers });
         
 
         this.connectPromise = new Promise((resolve, reject) => {
             this.channel.onConnect(error => {
                 if (error) {
-                    console.log('error');
                     console.error(error.message);
-                    return;
+                    reject('error');
                 } else {
-                    this.channel.emit('join', this.name);
                     player.id = this.channel.id;
-                    resolve(this.channel.id);
+                    player.name = this.name;
+                    this.channel.emit('join', this.name);
+                    resolve('success');
                 }
             });
         })
     }
 
-    connect(state, loopRef, render, player, updateLeaderBoard, gameCtx) {
-        this.connectPromise.then((channelId) => {
-            render.meId = channelId;
-            render.playerName = localStorage.getItem('name');
+    connect(state, loopRef, render, updateLeaderBoard, gameCtx) {
+        this.connectPromise.then(() => {
             this.channel.on('update', (newUpdate) => {
                 state.handleUpdate(newUpdate)
             })
@@ -33,8 +32,7 @@ module.exports = class Network {
                 clearInterval(loopRef);
             })
             this.channel.on('leaderboard', (leaderboard) => {
-                // let deserialized = leaderboard.map(buffer => this.deserializeLeaderBoard(buffer));
-                // updateLeaderBoard(deserialized, gameCtx);
+                updateLeaderBoard(leaderboard, gameCtx);
             })
             this.channel.on('attack', (id) => {
                 render.attackList.push(id);
@@ -42,6 +40,8 @@ module.exports = class Network {
             this.channel.on('die', (id) => {
                 render.dieList.push(id);
             })
+        }).catch(err => {
+            console.log(err);
         })
     }
 
