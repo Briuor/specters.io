@@ -35,7 +35,7 @@ class Player {
     }
 
     leaderBoardSerialize() {
-        return { id: this.id, name: this.name, kills: this.kills };
+        return { id: this.uid, name: this.name, kills: this.kills };
     }
 
     move(dt, clientside=false) {
