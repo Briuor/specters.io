@@ -1,8 +1,9 @@
 const Bullet = require("./bullet");
 
 class Player {
-    constructor(id, name, x, y) {
+    constructor(id, name, x, y, uid=null) {
         this.id = id;
+        this.uid = uid;
         this.x = x;
         this.y = y;
         this.kills = 0;
@@ -12,7 +13,7 @@ class Player {
         this.speed = 70;
         this.color = '#fff';
         this.angle = 0;
-        this.impulsed = false;
+        this.impulsed = 0;
         this.impulseSpeed = 8;
         this.impulseVel = 20 * 80;
         this.hittedById = null;
@@ -23,13 +24,14 @@ class Player {
         this.die = false;
         this.dieDelay = 600;
         this.dieTime = 0;
+        this.started = false;
     }
     serializeMe() {
-        return { id: this.id, x: this.x, y: this.y, angle: this.angle, kills: this.kills, impulsed: this.impulsed, impulseAngle: this.impulseAngle };
+        return { id:this.uid, x: this.x, y: this.y, angle: this.angle, kills: this.kills, impulsed: this.impulsed };
     }
 
     serialize() {
-        return { id: this.id, name: this.name, x: this.x, y: this.y, angle:this.angle, kills: this.kills };
+        return { id: this.uid, name: this.name, x: this.x, y: this.y, angle:this.angle, kills: this.kills };
     }
 
     leaderBoardSerialize() {
@@ -44,7 +46,7 @@ class Player {
             this.y += this.impulseVel * Math.sin(this.impulseAngle - Math.PI / 2) * dt;
             this.impulseVel *= 0.9;
         } else {
-            this.impulsed = false;
+            this.impulsed = 0;
             if (this.direction.right) this.x += this.speed * dt;
             if (this.direction.left) this.x -= this.speed * dt;
             if (this.direction.up) this.y -= this.speed * dt;
@@ -58,7 +60,7 @@ class Player {
     prepareImpulse() {
         this.impulseSpeed = 0.1 * 80;
         this.impulseVel = 20 * 80;
-        this.impulsed = true;
+        this.impulsed = 1;
     }
 
     impulse(player, bullet) {
@@ -67,11 +69,11 @@ class Player {
         this.prepareImpulse();
     }
 
-    shoot(ownerId) {
+    shoot(ownerId, ownerSocketId) {
         if (Date.now() - this.shootCooldown >= this.shootTime) {
             this.shootTime = Date.now();
             this.shot = true;
-            return new Bullet(this.x, this.y, 10, this.angle, ownerId, this.r, this.kills);
+            return new Bullet(this.x, this.y, 10, this.angle, ownerId, ownerSocketId, this.r, this.kills);
         }
         return false;
     }

@@ -32,16 +32,17 @@ module.exports = class Render {
 
     drawPlayer(ctx, me, gameOver, attackSound, dieSound) {
         let sizeIncrease = me.kills * 4;
-        // ctx.fillStyle = 'yellow';
-        // ctx.beginPath();
-        // ctx.arc(me.screenX, me.screenY, this.meRay/2 + sizeIncrease/2, 0, 2 * Math.PI);
-        // ctx.fill();
+        ctx.fillStyle = 'yellow';
+        ctx.beginPath();
+        ctx.arc(me.screenX, me.screenY, this.meRay/2 + sizeIncrease/2, 0, 2 * Math.PI);
+        ctx.fill();
 
         let col;
         let angle = (180 * me.angle) / Math.PI;
         if (angle < 0) angle = 360 + angle;
 
         if (this.attackList.length > 0 && this.attackList.includes(me.id)) {
+            console.log(this.attackList)
             this.currentFrame = 0;
             this.attackAnimation = true;
             this.attackList.splice(this.attackList.findIndex(id => me.id == id), 1);

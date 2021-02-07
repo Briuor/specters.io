@@ -2,7 +2,9 @@ const Player = require('./models/player');
 const Map = require('../shared/map');
 const CollisionHandler = require('./physics/collisionHandler');
 const { SnapshotInterpolation } = require('@geckos.io/snapshot-interpolation');
+const mainModel = require('../shared/models');
 
+let uidCounter = 0;
 
 class Game {
     constructor(io) {
@@ -19,14 +21,17 @@ class Game {
 
         this.leaderBoardDelay = 1000;
         this.lastLeaderBoardUpdate = Date.now();
-        this.tick = 0;
     }
 
     addPlayer(channel, name) {
+
         this.channels[channel.id] = channel;
-        // const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
-        // let { x, y } = respawnList[Math.round(Math.random() * 2)];
-        this.players[channel.id] = new Player(channel.id, name, 700, 600);
+        const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
+        let { x, y } = respawnList[Math.round(Math.random() * 2)];
+        let uid = uidCounter++;
+        // console.log(uid);
+        this.players[channel.id] = new Player(channel.id, name, x, y, uid);
+        this.channels[channel.id].emit('start', { id: uid, x, y });
     }
 
     removePlayer(channel) {
@@ -50,9 +55,9 @@ class Game {
                 this.players[channel.id].updateAngle({ distX: input[0], distY: input[1]});
             }
             else if (type == 'mouseclick') {
-                const bullet = this.players[channel.id].shoot(channel.id);
+                const bullet = this.players[channel.id].shoot(this.players[channel.id].uid, channel.id);
                 if (bullet) {
-                    this.getNearbyPlayers(this.players[channel.id]).map(p => this.channels[p.id].emit('attack', channel.id));
+                    this.getNearbyPlayers(this.players[channel.id]).map(p => this.channels[p.id].emit('attack', this.players[channel.id].uid));
                     this.bullets.push(bullet);
                 }
             }
@@ -84,17 +89,17 @@ class Game {
                             this.players[playerScoreId].updateStatus();
                         }
                         // DIE
-                        dieList.push(playerId);
+                        dieList.push({ uid: this.players[playerId].uid, id: playerId });
                     }
                 }
             }
         });
         
         // emit die events
-        dieList.map(id => {
-            this.io.emit('die', id);
-            this.players[id].die = true;
-            this.players[id].dieTime = Date.now();
+        dieList.map(playerIds => {
+            this.io.emit('die', playerIds.uid);
+            this.players[playerIds.id].die = true;
+            this.players[playerIds.id].dieTime = Date.now();
         })
 
         // move bullet
@@ -109,11 +114,11 @@ class Game {
         this.bullets.forEach((bullet, bulletIndex) => {
             let bulletToDeleteIndex = -1;
             Object.keys(this.players).forEach(playerId => {
-                if (bullet.ownerId != playerId) {
+                if (bullet.ownerId != this.players[playerId].uid) {
                     const player = this.players[playerId];
-                    if (this.players[bullet.ownerId] && CollisionHandler.circleCircleCollision(bullet, player)) {
-                        player.impulse(this.players[bullet.ownerId], this.bullets[bulletIndex]);
-                        player.hittedById = bullet.ownerId;
+                    if (this.players[bullet.ownerSocketId] && CollisionHandler.circleCircleCollision(bullet, player)) {
+                        player.impulse(this.players[bullet.ownerSocketId], this.bullets[bulletIndex]);
+                        player.hittedById = bullet.ownerSocketId;
                         bulletToDeleteIndex = bulletIndex;
                     }
                 }
@@ -135,35 +140,31 @@ class Game {
         }
 
         // send update event to each client
-        // if (this.tick % 4 === 0) {
+        Object.keys(this.channels).forEach(channelId => {
+            const nearbyPlayers = Object.values(this.players).filter(
+                p => p !== this.players[channelId] && p.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
+            );
+            const nearbyBullets = this.bullets.filter(
+                b => b.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
+            );
+            let me = this.players[channelId].serializeMe();
+            let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
+            let bullets = nearbyBullets.map(b => b.serialize());
+            
+            let worldState = {
+                me: [me],
+                otherPlayers,
+                bullets
+            };
 
-            Object.keys(this.channels).forEach(channelId => {
-                const nearbyPlayers = Object.values(this.players).filter(
-                    p => p !== this.players[channelId] && p.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
-                );
-                const nearbyBullets = this.bullets.filter(
-                    b => b.distanceTo(this.players[channelId]) <= (this.gameWidth + 190) / 2,
-                );
-                let me = this.players[channelId].serializeMe();
-                let otherPlayers = nearbyPlayers.filter(p => p.id !== channelId).map(p => p.serialize());
-                let bullets = nearbyBullets.map(b => b.serialize());
-                // let players = [me]
-                // if (otherPlayers.length > 0) {
-                //     players = [me, ...otherPlayers];
-                // }
-                let worldState = {
-                    me: [me],
-                    otherPlayers,
-                    bullets
-                };
-
-                const snapshot = this.SI.snapshot.create(worldState)
-
-                this.channels[channelId].emit('update', snapshot);
-
-            });
-        // }
-
+            // console.log(worldState);
+            const snapshot = this.SI.snapshot.create(worldState);
+            // console.log(snapshot.state);
+            const buffer = mainModel.toBuffer(snapshot);
+            // console.log(JSON.stringify(snapshot).length);
+            console.log(buffer)
+            this.channels[channelId].raw.emit(buffer);
+        });
     }
 }
 

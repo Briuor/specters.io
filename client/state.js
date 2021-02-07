@@ -1,3 +1,5 @@
+const mainModel = require('../shared/models');
+
 module.exports = class State {
 
     constructor(si) {
@@ -91,7 +93,10 @@ module.exports = class State {
         return { name: buffer[0], score: buffer[1] };
     }
 
-    handleUpdate(update) {
-        this.SI.snapshot.add(update);
+    handleUpdate(buffer) {
+        let snapshot = buffer;
+        snapshot.state.otherPlayers = snapshot.state.otherPlayers ? snapshot.state.otherPlayers : [];
+        snapshot.state.bullets = snapshot.state.bullets ? snapshot.state.bullets : [];
+        this.SI.snapshot.add(snapshot);
     }
 }
