@@ -29,6 +29,7 @@ module.exports = class Game {
         });
         this.leaderBoardWrapper = document.getElementById('leaderboard-wrapper');
         this.leaderBoard = document.getElementById('leaderboard');
+        this.pingEl = document.getElementById('ping');
         this.playAgainModal = document.getElementById('play-again-modal');
         this.playAgainForm = document.getElementById('play-again-form');
         this.killsElement = document.getElementById('kills');
@@ -148,6 +149,11 @@ module.exports = class Game {
         context.leaderBoardWrapper.style.marginRight = context.canvas.getBoundingClientRect().left;
     }
 
+    ping(latency, context) {
+        context.pingEl.innerText = latency;
+        context.pingEl.style.marginLeft = context.canvas.getBoundingClientRect().left;
+    }
+
     gameOver() {
         if (this.network.channel && this.network.channel.id) {
             this.network.channel.close();
@@ -228,7 +234,7 @@ module.exports = class Game {
 
         setTimeout(() => {
             Promise.all([
-                this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this),
+                this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this.ping, this),
                 this.loader.loadImage('ghost', 'images/ghost.png'),
                 this.loader.loadImage('tileset', 'images/tileset.png'),
                 this.loader.loadImage('projectile', 'images/projectile.png'),
@@ -244,6 +250,7 @@ module.exports = class Game {
                 this.render.projectileImage = this.loader.getImage('projectile');
                 this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
                 this.leaderBoardWrapper.style.display = 'block';
+                this.pingEl.style.display = 'block';
             })
         }, 500);
     }

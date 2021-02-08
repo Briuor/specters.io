@@ -12,10 +12,13 @@ OK- Adjust Leaderboard
 OK- Fix DIE
 OK- Buffer Data
 OK- Receber dados de spawn e uid
-- ping client side
+OK- ping client side
 - Cooldown bar
 - How to play
+- Fix hit box
 
+- Music
+- Normalize Diagonal
 - Test slow projectile
 - Fix sprite when increase size
 - Improve Art

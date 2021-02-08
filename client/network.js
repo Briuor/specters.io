@@ -31,7 +31,7 @@ module.exports = class Network {
         })
     }
 
-    connect(state, loopRef, render, updateLeaderBoard, gameCtx) {
+    connect(state, loopRef, render, updateLeaderBoard, ping, gameCtx) {
         this.connectPromise.then(() => {
             this.channel.onRaw((newUpdate) => {
                 newUpdate = mainModel.fromBuffer(newUpdate);
@@ -46,7 +46,7 @@ module.exports = class Network {
             this.channel.on('leaderboard', (leaderboard) => {
                 updateLeaderBoard(leaderboard, gameCtx);
             })
-            
+
             this.channel.on('attack', (id) => {
                 render.attackList.push(id);
             })
@@ -57,7 +57,7 @@ module.exports = class Network {
 
             this.channel.on('pong', () => {
                 latency = Date.now() - this.startPingTime;
-                console.log(latency);
+                ping(latency, gameCtx);
             });
         }).catch(err => {
             console.log(err);
