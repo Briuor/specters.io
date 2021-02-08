@@ -24,17 +24,18 @@ io.onConnection( channel => {
 
     channel.on('imc', () => {
         game.handleInput(channel, null, 'mouseclick');
-        // console.log(channel.id + ' pressed');
     });
 
     channel.on('imm', (input) => {
         game.handleInput(channel, input, 'mousemove');
-        // console.log(channel.id + ' pressed');
     });
 
     channel.on('ik', (direction) => {
         game.handleInput(channel, direction, 'keyboard');
-        // console.log(channel.id + ' pressed');
+    });
+
+    channel.on('ping', () => {
+        channel.emit('pong');
     });
     
     channel.onDisconnect(() => {

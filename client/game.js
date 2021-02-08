@@ -181,7 +181,7 @@ module.exports = class Game {
             if (serverSnapshot && playerSnapshot) {
                 // get the current player position on the server
                 const serverPos = serverSnapshot.state.me[0];
-                // console.log('server: ', serverSnapshot)
+
                 this.player.kills = serverPos.kills;
                 this.player.impulsed = serverPos.impulsed;
 
@@ -228,7 +228,7 @@ module.exports = class Game {
 
         setTimeout(() => {
             Promise.all([
-                this.network.connect(this.state, this.loopRef, this.render, this.player, this.updateLeaderBoard, this),
+                this.network.connect(this.state, this.loopRef, this.render, this.updateLeaderBoard, this),
                 this.loader.loadImage('ghost', 'images/ghost.png'),
                 this.loader.loadImage('tileset', 'images/tileset.png'),
                 this.loader.loadImage('projectile', 'images/projectile.png'),

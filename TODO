@@ -10,8 +10,8 @@ OK- Fix openning several connect when click play again[ bug ]
 OK- player move 70
 OK- Adjust Leaderboard
 OK- Fix DIE
-- Buffer Data
-- Receber dados de spawn
+OK- Buffer Data
+OK- Receber dados de spawn e uid
 - ping client side
 - Cooldown bar
 - How to play

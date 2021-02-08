@@ -42,7 +42,6 @@ module.exports = class Render {
         if (angle < 0) angle = 360 + angle;
 
         if (this.attackList.length > 0 && this.attackList.includes(me.id)) {
-            console.log(this.attackList)
             this.currentFrame = 0;
             this.attackAnimation = true;
             this.attackList.splice(this.attackList.findIndex(id => me.id == id), 1);
