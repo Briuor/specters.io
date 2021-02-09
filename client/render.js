@@ -32,10 +32,14 @@ module.exports = class Render {
 
     drawPlayer(ctx, me, gameOver, attackSound, dieSound) {
         let sizeIncrease = me.kills * 4;
-        ctx.fillStyle = 'yellow';
-        ctx.beginPath();
-        ctx.arc(me.screenX, me.screenY, this.meRay/2 + sizeIncrease/2, 0, 2 * Math.PI);
-        ctx.fill();
+        // debug hit box
+        // let collisionAdjustSize = (this.meRay + sizeIncrease) / 10;
+        // let collisionAdjustY = (this.meRay + sizeIncrease) / 18;
+        // ctx.fillStyle = 'yellow';
+        // ctx.beginPath();
+        // ctx.arc(me.screenX, me.screenY, this.meRay/2 + sizeIncrease/2, 0, 2 * Math.PI);
+        // ctx.arc(me.screenX, me.screenY - collisionAdjustY, (this.meRay / 2 + sizeIncrease / 2) - collisionAdjustSize, 0, 2 * Math.PI);
+        // ctx.fill();
 
         let col;
         let angle = (180 * me.angle) / Math.PI;
@@ -161,20 +165,22 @@ module.exports = class Render {
 
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay / 2;
         ctx.drawImage(this.playerImage, this.ocurrentFrame[p.id] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay + sizeIncrease, 26 + sizeIncrease);
-        this.pixelCanvas.drawName(ctx, p.name, 1, Math.floor(p.x - camera.x - (p.name.length * 2)), Math.floor(p.y - this.meRay - camera.y + 7));
+        this.pixelCanvas.drawName(ctx, p.name.trim(), 1, Math.floor(p.x - camera.x - (p.name.trim().length * 2)), Math.floor(p.y - this.meRay - camera.y + 7));
     }
 
     drawBullet(ctx, p, camera) {
         // ctx.fillStyle = 'yellow';
         // ctx.beginPath();
-        // ctx.arc(p.x - this.bulletRay - camera.x, p.y - this.bulletRay - camera.y, this.bulletRay/2, 0, 2 * Math.PI);
+        // ctx.arc(p.x - camera.x, p.y - camera.y, p.r / 2, 0, 2 * Math.PI);
         // ctx.fill();
 
         ctx.save();
         ctx.translate(p.x - camera.x, p.y - camera.y);
         ctx.rotate(Math.PI + p.angle);
         ctx.translate(-(p.x - camera.x), -(p.y - camera.y));
-        ctx.drawImage(this.projectileImage, 0, 0, this.bulletRay, this.bulletRay, p.x - p.r/2 - camera.x, p.y - p.r - camera.y, p.r, p.r);
+        ctx.drawImage(this.projectileImage, 0, 0, this.bulletRay, this.bulletRay, p.x - p.r/2 - camera.x, p.y - p.r/2 - camera.y, p.r, p.r);
         ctx.restore();
+
+
     }
 }

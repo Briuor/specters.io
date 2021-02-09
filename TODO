@@ -13,10 +13,12 @@ OK- Fix DIE
 OK- Buffer Data
 OK- Receber dados de spawn e uid
 OK- ping client side
+- Fix hit box
 - Cooldown bar
 - How to play
-- Fix hit box
+- No mobile version yet page
 
+- Improve Code Architure
 - Music
 - Normalize Diagonal
 - Test slow projectile

@@ -26,8 +26,9 @@ class Game {
     addPlayer(channel, name) {
 
         this.channels[channel.id] = channel;
-        const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
-        let { x, y } = respawnList[Math.round(Math.random() * 2)];
+        // const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
+        const respawnList = [{ x: 700, y: 600 }];
+        let { x, y } = respawnList[Math.round(0)];
         let uid = uidCounter++;
         // console.log(uid);
         this.players[channel.id] = new Player(channel.id, name, x, y, uid);
@@ -68,7 +69,6 @@ class Game {
     }
 
     update() {
-        this.tick++;
         let now = Date.now();
         let dt = (now - this.lastUpdateTime) / 1000;
         this.lastUpdateTime = now;
@@ -162,7 +162,7 @@ class Game {
             // console.log(snapshot.state);
             const buffer = mainModel.toBuffer(snapshot);
             // console.log(JSON.stringify(snapshot).length);
-            console.log(buffer)
+            // console.log(buffer)
             this.channels[channelId].raw.emit(buffer);
         });
     }

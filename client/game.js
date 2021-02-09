@@ -17,7 +17,7 @@ module.exports = class Game {
         this.gameName = document.getElementsByClassName('game-name')[0];
         this.name = document.getElementById('name-play');
         this.name.addEventListener("input", (e) => {
-            e.target.value = e.target.value.replace(new RegExp(/[0-9]{0,7}$/,'ig'), '');
+            e.target.value = e.target.value.replace(new RegExp(/[0-9]/,'ig'), '');
         });
         this.name.focus();
         this.playForm.addEventListener('submit', (e) => {
@@ -223,8 +223,8 @@ module.exports = class Game {
             // draw
             this.camera.draw(this.ctx, this.map);
 
-            this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound);
             this.render.drawPlayers(this.ctx, this.otherPlayers, this.bullets, this.camera, this.attackSound, this.dieSound);
+            this.render.drawPlayer(this.ctx, this.player, this.gameOver, this.attackSound, this.dieSound);
         }
     }
 
@@ -239,12 +239,12 @@ module.exports = class Game {
                 this.loader.loadImage('tileset', 'images/tileset.png'),
                 this.loader.loadImage('projectile', 'images/projectile.png'),
             ]).then(() => {
+                this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
                 this.input.listen(this.network, this.camera, this.canvas, this.player);
                 this.body.style.background = '#000';
                 this.body.style.cursor = 'crosshair';
                 this.loadingDiv.style.display = 'none';
                 this.canvas.style.display = 'block';
-                this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
                 this.render.playerImage = this.loader.getImage('ghost');
                 this.camera.tilesetImage = this.loader.getImage('tileset');
                 this.render.projectileImage = this.loader.getImage('projectile');

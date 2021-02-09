@@ -39,7 +39,7 @@ module.exports = class Network {
             })
             
             this.channel.onDisconnect(() => {
-                console.log('disconnected')
+                // console.log('disconnected')
                 clearInterval(loopRef);
             })
             
