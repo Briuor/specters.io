@@ -164,8 +164,8 @@ module.exports = class Render {
         }
 
         let playerSizeIncrease = sizeIncrease / 2 + this.meRay / 2;
-        ctx.drawImage(this.playerImage, this.ocurrentFrame[p.id] * (this.meRay), col * 26, this.meRay, 26, p.x - playerSizeIncrease - camera.x, p.y - playerSizeIncrease - camera.y, this.meRay + sizeIncrease, 26 + sizeIncrease);
-        this.pixelCanvas.drawName(ctx, p.name.trim(), 1, Math.floor(p.x - camera.x - (p.name.trim().length * 2)), Math.floor(p.y - this.meRay - camera.y + 7));
+        ctx.drawImage(this.playerImage, this.ocurrentFrame[p.id] * (this.meRay), col * 26, this.meRay, 26, Math.floor(p.x - playerSizeIncrease - camera.x), Math.floor(p.y - playerSizeIncrease - camera.y), this.meRay + sizeIncrease, 26 + sizeIncrease);
+        this.pixelCanvas.drawName(ctx, p.name.trim(), 1, Math.floor(p.x - camera.x - (p.name.trim().length * 2)), Math.floor(p.y - this.meRay - camera.y - playerSizeIncrease+21));
     }
 
     drawBullet(ctx, p, camera) {

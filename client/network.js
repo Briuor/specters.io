@@ -3,7 +3,7 @@ const { iceServers } = require('@geckos.io/client');
 const mainModel = require('../shared/models');
 
 module.exports = class Network {
-    start(name, player) {
+    start(name, player, errorModal, errorTextEl) {
         this.name = name;
         this.channel = geckos({ port: 3000, iceServers });
         this.startPingTime = Date.now();
@@ -16,10 +16,18 @@ module.exports = class Network {
             this.channel.onConnect(error => {
                 if (error) {
                     console.error(error.message);
+                    errorModal.style.display = 'block';
+                    errorTextEl.innerText = "Connection Error, try again later!";
                     reject('error');
                 } else {
                     player.name = this.name;
                     this.channel.emit('join', this.name);
+                    this.channel.on('too_many_players', () => {
+                        errorModal.style.display = 'block';
+                        errorTextEl.innerText = "Too many players, try again later!";
+                        reject('too many players');
+                    })
+
                     this.channel.on('start', ({ x, y, id }) => {
                         player.x = x;
                         player.y = y;
@@ -32,7 +40,7 @@ module.exports = class Network {
     }
 
     connect(state, loopRef, render, updateLeaderBoard, ping, gameCtx) {
-        this.connectPromise.then(() => {
+        return this.connectPromise.then((msg) => {
             this.channel.onRaw((newUpdate) => {
                 newUpdate = mainModel.fromBuffer(newUpdate);
                 state.handleUpdate(newUpdate)
@@ -56,11 +64,15 @@ module.exports = class Network {
             })
 
             this.channel.on('pong', () => {
-                latency = Date.now() - this.startPingTime;
+                let latency = Date.now() - this.startPingTime;
                 ping(latency, gameCtx);
             });
+
+            return msg;
         }).catch(err => {
             console.log(err);
+            this.channel.close();
+            return err;
         })
     }
 }

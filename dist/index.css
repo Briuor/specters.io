@@ -38,10 +38,20 @@ div.play-btn {
   text-align: center;
 }
 
-button#play {
+button#howto {
   padding: 15px;
   width: 100%;
-  color: white;
+  color: #fff;
+  background-color: #252525;
+  border:none;
+  cursor: pointer;
+}
+
+button#play {
+  margin-bottom: 5px;
+  padding: 15px;
+  width: 100%;
+  color: #fff;
   background-color: #ff0000;
   border:none;
   cursor: pointer;
@@ -71,6 +81,11 @@ div#ping {
   top: 10px;
   left: 20px;
   display: none;
+     -moz-user-select: none; 
+  -webkit-user-select: none;
+  -ms-user-select:none;
+  user-select:none;
+  -o-user-select:none;
   font-size: 0.9em;
 }
 
@@ -106,10 +121,10 @@ li {
   text-align: left;
 }
 span.leaderboard-score {
-float: right;
+  float: right;
 }
 
-div#play-again-modal {
+div#play-again-modal, div#error-modal {
   position: absolute;
   background: #fff;
   color: #000;
@@ -119,6 +134,17 @@ div#play-again-modal {
   padding: 30px;
   border-radius: 5px;
   display: none;
+}
+
+div#ok {
+  text-align: center;
+}
+
+button#ok-btn {
+  color: #fff;
+  background-color: #ff0000;
+  border: none;
+  width: 100px;
 }
 
 div#play-again-modal input{
@@ -138,5 +164,34 @@ div#loading {
   left: 50%;
   transform: translate(-50%, -60%);
   display: none;
+}
+
+div#loading h1 {
   font-size: 3em;
+  margin-bottom: 20px;
+}
+
+div#loading p {
+  margin: 0;
+  padding: 2px;
+  text-align: left;
+}
+
+div#loading p:nth-child(3) {
+  margin-top: 20px;
+  text-align: center;
+}
+
+div#loading p img {
+  vertical-align: middle;
+  height: 50px;
+}
+
+div#loading p span {
+  padding-right: 30px;
+}
+
+div#disable-adblock {
+  text-align: center;
+  margin-top: 10px;
 }

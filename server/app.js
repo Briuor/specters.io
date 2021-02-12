@@ -9,7 +9,7 @@ const io = geckos({ iceServers })
 const cors = require('cors');
 const Game = require('./game');
 
-app.use(express.static(path.join(__dirname, '..', 'dist')));
+app.use('/', express.static(path.join(__dirname, '..', 'dist')));
 app.use(cors());
 
 io.addServer(server);
@@ -18,8 +18,13 @@ server.listen(3000);
 io.onConnection( channel => {
 
     channel.on('join', (playerName) => {
-        game.addPlayer(channel, playerName);
-        console.log(channel.id + ' connected');
+        if (Object.keys(game.players).length >= 30) {
+            channel.emit('too_many_players');
+        } else {
+            game.addPlayer(channel, playerName);
+            console.log(channel.id + ' connected');
+        }
+        console.log('Players: ', Object.keys(game.players).length);
     });
 
     channel.on('imc', () => {

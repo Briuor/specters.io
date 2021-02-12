@@ -29,6 +29,14 @@ module.exports = class Game {
         });
         this.leaderBoardWrapper = document.getElementById('leaderboard-wrapper');
         this.leaderBoard = document.getElementById('leaderboard');
+        this.errorModal = document.getElementById('error-modal');
+        this.errorTextEl = document.getElementById('error-text');
+        this.disableAdblockEl = document.getElementById('disable-adblock');
+        
+        this.okBtn = document.getElementById('ok-btn');
+        this.okBtn.addEventListener("click", () => {
+            window.location.reload();
+        })
         this.pingEl = document.getElementById('ping');
         this.playAgainModal = document.getElementById('play-again-modal');
         this.playAgainForm = document.getElementById('play-again-form');
@@ -64,7 +72,7 @@ module.exports = class Game {
     init() {
         this.attackSound = new Howl({
             src: ['./sounds/attack.mp3'],
-            volume: 1,
+            volume: 0.8,
         });
         this.dieSound = new Howl({
             src: ['./sounds/die.mp3'],
@@ -150,7 +158,7 @@ module.exports = class Game {
     }
 
     ping(latency, context) {
-        context.pingEl.innerText = latency;
+        context.pingEl.innerText = latency + ' ms';
         context.pingEl.style.marginLeft = context.canvas.getBoundingClientRect().left;
     }
 
@@ -230,7 +238,8 @@ module.exports = class Game {
 
     start(playerName) {
         this.loadingDiv.style.display = 'block';
-        this.network.start(playerName, this.player);
+        this.disableAdblockEl.style.display = 'none';
+        this.network.start(playerName, this.player, this.errorModal, this.errorTextEl);
 
         setTimeout(() => {
             Promise.all([
@@ -238,20 +247,22 @@ module.exports = class Game {
                 this.loader.loadImage('ghost', 'images/ghost.png'),
                 this.loader.loadImage('tileset', 'images/tileset.png'),
                 this.loader.loadImage('projectile', 'images/projectile.png'),
-            ]).then(() => {
-                this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
-                this.input.listen(this.network, this.camera, this.canvas, this.player);
-                this.body.style.background = '#000';
-                this.body.style.cursor = 'crosshair';
-                this.loadingDiv.style.display = 'none';
-                this.canvas.style.display = 'block';
-                this.render.playerImage = this.loader.getImage('ghost');
-                this.camera.tilesetImage = this.loader.getImage('tileset');
-                this.render.projectileImage = this.loader.getImage('projectile');
-                this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
-                this.leaderBoardWrapper.style.display = 'block';
-                this.pingEl.style.display = 'block';
+            ]).then((res) => {
+                if (res[0] == 'success') {
+                    this.loopRef = setInterval(this.run.bind(this), 1000 / 60);
+                    this.input.listen(this.network, this.camera, this.canvas, this.player);
+                    this.body.style.background = '#000';
+                    this.body.style.cursor = 'crosshair';
+                    this.loadingDiv.style.display = 'none';
+                    this.canvas.style.display = 'block';
+                    this.render.playerImage = this.loader.getImage('ghost');
+                    this.camera.tilesetImage = this.loader.getImage('tileset');
+                    this.render.projectileImage = this.loader.getImage('projectile');
+                    this.leaderBoardWrapper.style.marginRight = this.canvas.getBoundingClientRect().left;
+                    this.leaderBoardWrapper.style.display = 'block';
+                    this.pingEl.style.display = 'block';
+                }
             })
-        }, 500);
+        }, 1200);
     }
 }

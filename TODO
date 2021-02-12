@@ -13,14 +13,16 @@ OK- Fix DIE
 OK- Buffer Data
 OK- Receber dados de spawn e uid
 OK- ping client side
-- Fix hit box
+OK- Fix hit box
+OK- Otherplayer name above fix
+OK- How to play
+- Limit 30 players
 - Cooldown bar
-- How to play
 - No mobile version yet page
 
 - Improve Code Architure
 - Music
 - Normalize Diagonal
-- Test slow projectile
-- Fix sprite when increase size
+OK- Test slow projectile
+OK- Fix sprite when increase size
 - Improve Art

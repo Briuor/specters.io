@@ -14,7 +14,7 @@ module.exports = class Map {
     isPositionLava(player) {
         let sizeIncrease = player.kills * 4;
         var tileX = Math.floor(player.x / this.tsize);
-        var tileY = Math.floor((player.y + 11 + sizeIncrease/2) / this.tsize);
+        var tileY = Math.floor((player.y + 8 +sizeIncrease/2) / this.tsize);
 
         const checkTile = this.tiles[tileY * this.cols + tileX];
         return checkTile == 38 || checkTile == 22 || checkTile == 28 || checkTile == 33;
