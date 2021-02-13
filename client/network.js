@@ -5,7 +5,7 @@ const mainModel = require('../shared/models');
 module.exports = class Network {
     start(name, player, errorModal, errorTextEl) {
         this.name = name;
-        this.channel = geckos({ port: 3000, iceServers });
+        this.channel = geckos({ port: window.location.href.includes('specters') ? 443 : 3000, iceServers });
         this.startPingTime = Date.now();
         setInterval(() => {
             this.startPingTime = Date.now();

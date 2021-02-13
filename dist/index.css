@@ -195,3 +195,13 @@ div#disable-adblock {
   text-align: center;
   margin-top: 10px;
 }
+
+span#ad {
+  color: #ff0000;
+}
+
+div#nomobile {
+  text-align: center;
+  display: none;
+  margin-top: 50px;
+}

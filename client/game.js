@@ -33,6 +33,16 @@ module.exports = class Game {
         this.errorTextEl = document.getElementById('error-text');
         this.disableAdblockEl = document.getElementById('disable-adblock');
         
+        if (this.detectMob()) {
+            this.gameName.style.display = 'none';
+            this.playForm.style.display = 'none';
+            this.disableAdblockEl.style.display = 'none';
+            this.noMobileVersion = document.getElementById('nomobile');
+            this.noMobileVersion.style.display = 'block';
+            return;
+        }
+
+
         this.okBtn = document.getElementById('ok-btn');
         this.okBtn.addEventListener("click", () => {
             window.location.reload();
@@ -67,6 +77,22 @@ module.exports = class Game {
         window.addEventListener("resize", () => { this.resizeCanvas(); });
 
         this.init();
+    }
+
+    detectMob() {
+        const toMatch = [
+            /Android/i,
+            /webOS/i,
+            /iPhone/i,
+            /iPad/i,
+            /iPod/i,
+            /BlackBerry/i,
+            /Windows Phone/i
+        ];
+
+        return toMatch.some((toMatchItem) => {
+            return navigator.userAgent.match(toMatchItem);
+        });
     }
 
     init() {

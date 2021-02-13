@@ -28,8 +28,8 @@
   },
   "scripts": {
     "build": "npx webpack --config webpack.prod.js",
-    "prod": "npm run build && NODE_ENV=prod npm start",
-    "dev": "concurrently \"npx webpack --watch --config webpack.dev.js\" \"NODE_ENV=dev npm start\"",
+    "deploy": "npm run build && pm2 reload app",
+    "dev": "concurrently \"npx webpack --watch --config webpack.dev.js\" \"npm start\"",
     "start": "nodemon ./server/app.js"
   },
   "repository": {
