@@ -25,9 +25,9 @@ class Game {
 
     addPlayer(channel, name) {
         this.channels[channel.id] = channel;
-        // const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }];
-        const respawnList = [{ x: 700, y: 600 }];
-        let { x, y } = respawnList[Math.round(0)];
+        const respawnList = [{ x: 700, y: 600 }, { x: 2000, y: 600 }, { x: 1500, y: 2000 }, { x: 900, y: 2200 }, { x: 2200, y: 2000 }];
+        // const respawnList = [{ x: 2200, y: 2000 }];
+        let { x, y } = respawnList[Math.round(Math.random() * 4)];
         let uid = uidCounter++;
 
         this.players[channel.id] = new Player(channel.id, name, x, y, uid);
