@@ -12,3 +12,6 @@
 ```bash
 > npm run dev
 ```
+
+### Note
+I lost interest in the game, so I didn't publish it. However, it was useful for learning how to create multiplayer games, my own game engine, and 2D pixel art. Feel free to use the code and the art.
