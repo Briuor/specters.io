@@ -1,0 +1,16 @@
+# Specters.io
+> specters.io is a multiplayer browser game made from scratch(no engine) that runs over UDP protocol.
+
+<p align="center"> 
+[![Watch the video](https://raw.githubusercontent.com/Briuor/specters.io/master/demo/thumb.png)](https://raw.githubusercontent.com/Briuor/specters.io/master/demo/demo.webm)
+</p>
+
+## Installation
+```bash
+> npm install
+```
+
+## How to run
+```bash
+> npm run dev
+```

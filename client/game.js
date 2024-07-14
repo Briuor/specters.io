@@ -31,12 +31,10 @@ module.exports = class Game {
         this.leaderBoard = document.getElementById('leaderboard');
         this.errorModal = document.getElementById('error-modal');
         this.errorTextEl = document.getElementById('error-text');
-        this.disableAdblockEl = document.getElementById('disable-adblock');
         
         if (this.detectMob()) {
             this.gameName.style.display = 'none';
             this.playForm.style.display = 'none';
-            this.disableAdblockEl.style.display = 'none';
             this.noMobileVersion = document.getElementById('nomobile');
             this.noMobileVersion.style.display = 'block';
             return;
@@ -264,7 +262,6 @@ module.exports = class Game {
 
     start(playerName) {
         this.loadingDiv.style.display = 'block';
-        this.disableAdblockEl.style.display = 'none';
         this.network.start(playerName, this.player, this.errorModal, this.errorTextEl);
 
         setTimeout(() => {
